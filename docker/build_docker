@@ -1,0 +1,13 @@
+#! /bin/bash
+THIS_SCRIPT=$(realpath "$0")
+THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
+
+set -e -o pipefail
+
+cd "${THIS_SCRIPT_DIR}"
+
+# get the kos tools
+./kos_gettools
+
+# build the docker image, with name kosbuilder
+docker build -t kosbuilder .

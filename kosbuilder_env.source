@@ -1,0 +1,17 @@
+#! /bin/bash
+
+THIS_SCRIPT=$(realpath "$0")
+THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
+
+# SECRETS_MOUNT defines the location for kosbuilder to find the secrets.7z file
+SECRETS_MOUNT=${THIS_SCRIPT_DIR}/secrets/secrets_mount
+
+# SECRET_PASSWORD defines the password the the secrets.7z file
+export SECRET_PASSWORD=$(cat "${THIS_SCRIPT_DIR}/secrets/private/secrets_password")
+
+alias kosbuild="docker run -it --rm -e SECRET_PASSWORD=${SECRET_PASSWORD} -v .:/app -v ${SECRETS_MOUNT}:/mnt/secrets kosbuilder"
+
+if [[ $PS1 != *kosbuilder-env* ]]; then
+   export ORIG_PS1=$PS1
+   export PS1="(kosbuilder-env) $PS1"
+fi

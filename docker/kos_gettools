@@ -1,0 +1,16 @@
+#! /bin/bash
+
+THIS_SCRIPT=$(realpath "$0")
+THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
+
+set -e
+
+# downloads binaries that are regularly updated from our artifact repository
+pushd "${THIS_SCRIPT_DIR}"
+if [ ! -f kos-buildtools-java.tgz ]; then 
+  curl -O --fail https://sause2tcccknaprod0001.blob.core.windows.net/release/kos-buildtools-java.tgz
+  tar xf kos-buildtools-java.tgz
+else
+  echo "kos-buildtools-java.tgz already downloaded"
+fi
+popd

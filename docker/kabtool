@@ -1,0 +1,5 @@
+#! /bin/sh
+
+set -e
+
+java -jar /usr/local/lib/kabtool.jar $@
