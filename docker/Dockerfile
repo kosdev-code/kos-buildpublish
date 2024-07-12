@@ -20,6 +20,9 @@ RUN curl -fsSL ${MAVEN_URL} -o /tmp/apache-maven.tar.gz && \
 # Set environment variables for Maven
 ENV MAVEN_HOME=/opt/maven
 ENV PATH=$MAVEN_HOME/bin:$PATH
+# the following 2 environments are for the UI build
+ENV JAVA_CMD=java
+ENV KOS_INSTALL_PATH="/usr/local"
 
 # Install 7z
 RUN apt-get update && \
