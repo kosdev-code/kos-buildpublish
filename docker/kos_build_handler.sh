@@ -19,6 +19,7 @@ echo
 exit 1
 fi
 
+# ([0-9]+\\.[0-9]+\\.[0-9]+)-?(SNAPSHOT)?
 BUILD_DEF="$2"
 
 function handleSecrets() {
@@ -31,23 +32,29 @@ function copyAppToContainer() {
    cd ~/work
    echo "copying done..."
 }
-
-function handle_build() {
+function validate_build_definition() {
    # get the build definition 
    [ -z "${BUILD_DEF}" ] && BUILD_DEF="kosbuild.json"
-   [ ! -f "${BUILD_DEF}" ] && echo "build definition file, $BUILD_DEF, not found" && exit 1
-   build_cmd=$(jq -r ".build_cmd" < "${BUILD_DEF}")
-
-   # get the default keyset, if specified
-   default_keyset=$(jq -r ".default_keyset" < "${BUILD_DEF}")
-   if [ ! -z "${default_keyset}" ]; then
-      # setup the default keyset such that studio tools work with it
-      local KEYSET_PATH="$HOME/.kosbuild/keysets/${default_keyset}.keyset"
-      [ ! -f "${KEYSET_PATH}" ] && echo "keyset not found in ${KEYSET_PATH}" && exit 1
-      mkdir -p "$HOME/kosStudio"
-      echo "keyset = ${KEYSET_PATH}" > "${HOME}/kosStudio/tools.properties"
+   if [ ! -f "${BUILD_DEF}" ]; then 
+      echo "build definition file ($BUILD_DEF) not found"
+      if [ "$1" == "required" ]; then
+          echo "error: need build definition"
+          exit 1
+      fi
+   else
+      # get the default keyset, if specified
+      default_keyset=$(jq -r ".default_keyset" < "${BUILD_DEF}")
+      if [ ! -z "${default_keyset}" ]; then
+         # setup the default keyset such that studio tools work with it
+         local KEYSET_PATH="$HOME/.kosbuild/keysets/${default_keyset}.keyset"
+         [ ! -f "${KEYSET_PATH}" ] && echo "keyset not found in ${KEYSET_PATH}" && exit 1
+         mkdir -p "$HOME/kosStudio"
+         echo "keyset = ${KEYSET_PATH}" > "${HOME}/kosStudio/tools.properties"
+      fi
    fi
-   
+}
+
+function handle_build() {
    echo "kos_build_handler: building with command: ${build_cmd}"
    "${build_cmd}"
 
@@ -60,6 +67,7 @@ case $1 in
      cd
      handleSecrets
      copyAppToContainer
+     validate_build_definition required
      handle_build 
      ;;
   buildpublish)
@@ -68,8 +76,9 @@ case $1 in
   shell)
      echo "kos_build_handler: shell"
      cd
-     handleSecrets
+     handleSecrets     
      copyAppToContainer
+     validate_build_definition notrequired
      bash
      ;;
   *)

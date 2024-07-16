@@ -26,20 +26,38 @@ ENV KOS_INSTALL_PATH="/usr/local"
 
 # Install 7z
 RUN apt-get update && \
-    apt-get install -y p7zip-full jq && \
+    apt-get install -y p7zip-full jq curl unzip && \
     rm -rf /var/lib/apt/lists/*
+
+# Define the version of azcopy to download
+ARG AZCOPY_VERSION=10.25.1
+
+# Download and install azcopy for the correct architecture
+RUN case $(uname -m) in \
+    x86_64) \
+        curl -L https://azcopyvnext.azureedge.net/releases/release-10.25.1-20240612/azcopy_linux_amd64_10.25.1.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_amd64_$AZCOPY_VERSION/azcopy; \
+        ;; \
+    aarch64) \
+        curl -L https://azcopyvnext.azureedge.net/releases/release-10.25.1-20240612/azcopy_linux_arm64_10.25.1.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_arm64_$AZCOPY_VERSION/azcopy; \
+        ;; \
+    esac
 
 # Copy Java from the first stage to the new stage
 COPY --from=java $JAVA_HOME $JAVA_HOME
 
 WORKDIR /root
 
-COPY load_secrets.sh /usr/local/bin 
-COPY kos_build_handler.sh /usr/local/bin
 COPY lib/kabtool.jar /usr/local/lib
 COPY lib/publishtool.jar /usr/local/lib
-COPY publishtool /usr/local/bin
-COPY kabtool     /usr/local/bin
+COPY tools/publishtool /usr/local/bin
+COPY tools/kabtool     /usr/local/bin
+
+COPY tools/load_secrets.sh /usr/local/bin 
+COPY tools/kos_publish.sh /usr/local/bin
+COPY tools/kos_upload_artifact /usr/local/bin
+COPY tools/kos_artstore_upload_azure_container.sh /usr/local/bin
+
+COPY kos_build_handler.sh /usr/local/bin
 
 # Verify installations
 RUN java -version && \
@@ -47,7 +65,7 @@ RUN java -version && \
     npm -v && \
     mvn -v; \
     chmod 755 /usr/local/bin/load_secrets.sh /usr/local/bin/kabtool \
-              /usr/local/bin/publishtool /usr/local/bin/kos_build_handler.sh
+              /usr/local/bin/publishtool /usr/local/bin/kos_*
 
 ENTRYPOINT ["kos_build_handler.sh"]
 

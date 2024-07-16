@@ -18,6 +18,8 @@ SECRETS_ARCHIVE="$1"
 NPMRC_FILE="npmrc"
 MVNSETTINGS_FILE="settings.xml"
 KEYSETS_DIR="keysets"
+ARTIFACTSTORES="artifactstores"
+
 
 # extract the secrets to EXTRACT_DIR
 EXTRACT_DIR=/tmp/secrets
@@ -47,6 +49,12 @@ fi
 if [ -d "${EXTRACT_DIR}/${KEYSETS_DIR}" ]; then
     mkdir -p $HOME/.kosbuild
     mv "${EXTRACT_DIR}/${KEYSETS_DIR}" $HOME/.kosbuild
+fi
+
+## artifactstores folder
+if [ -d "${EXTRACT_DIR}/${ARTIFACTSTORES}" ]; then
+    mkdir -p $HOME/.kosbuild
+    mv "${EXTRACT_DIR}/${ARTIFACTSTORES}" $HOME/.kosbuild
 fi
 
 ## cleanup

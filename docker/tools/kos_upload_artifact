@@ -1,0 +1,36 @@
+#! /bin/bash
+
+set -e -o pipefail
+
+function usage() {
+    echo "$0 <kab filename> <repo> <remote filename>"
+    echo " will upload the file according to the repo definition found in the artifactstores configuration"
+}
+
+KABFILE="$1"
+REPO="$2"
+REMOTE_FILENAME="$3"
+
+if [ $# -lt 3 ]; then
+  usage
+  exit 1
+fi
+
+function getArtifactStoreType() {
+    ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
+    ARTSTORE_TYPE=$(jq -r ".type" < "${ARTSTORE_FILENAME}")    
+}
+
+# get the artifact store type
+getArtifactStoreType
+
+case ${ARTSTORE_TYPE} in
+   azurecontainer)
+        kos_artstore_upload_azure_container.sh "${KABFILE}" "${REPO}" "${REMOTE_FILENAME}"
+        ;;
+    *) 
+        echo "error: unknown artifact store type: ${ARTSTORE_TYPE}"
+        exit 1
+        ;;
+esac
+
