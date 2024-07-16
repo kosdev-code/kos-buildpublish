@@ -6,20 +6,18 @@ set -e -o pipefail
 # Installed to the docker image, this script will be called first when running the docker
 # image, and will set up the environment based on the goal.
 #
-
 if [ $# -lt 1 ]; then
 echo "kos_build_handler: you must specify a goal"
 echo "  goal may be one of the following:"
 echo "   build [build def]        : this will build the code in the current directory"
 echo "                              build def is the filename of the build definition file or"
 echo "                              will default to kosbuild.json"
-echo "   buildpublish             : this will build and publish the code in the current directory"
+echo "   buildpublish [build def] : this will build and publish the code in the current directory"
 echo "   shell                    : this will open a shell inside a temporary container for the kos-build image"
 echo
 exit 1
 fi
 
-# ([0-9]+\\.[0-9]+\\.[0-9]+)-?(SNAPSHOT)?
 BUILD_DEF="$2"
 
 function handleSecrets() {
@@ -43,7 +41,7 @@ function validate_build_definition() {
       fi
    else
       # get the default keyset, if specified
-      default_keyset=$(jq -r ".default_keyset" < "${BUILD_DEF}")
+      default_keyset=$(jq -r ".default_keyset" "${BUILD_DEF}")
       if [ ! -z "${default_keyset}" ]; then
          # setup the default keyset such that studio tools work with it
          local KEYSET_PATH="$HOME/.kosbuild/keysets/${default_keyset}.keyset"
@@ -55,31 +53,44 @@ function validate_build_definition() {
 }
 
 function handle_build() {
-   echo "kos_build_handler: building with command: ${build_cmd}"
-   "${build_cmd}"
-
-   # debug only
-   bash
+   local BUILD_CMD=$(jq -r ".build_cmd" "${BUILD_DEF}")
+   echo "kos_build_handler: building with command: ${BUILD_CMD}"
+   "${BUILD_CMD}"
 }
-case $1 in
-  build) 
-     echo "kos_build_handler: build-only"
+
+function handle_publish() {
+   kos_publish.sh "${BUILD_DEF}"
+}
+
+function common_handling() {
      cd
      handleSecrets
      copyAppToContainer
+}
+
+case $1 in
+  build) 
+     echo "kos_build_handler: build-only"
+     common_handling
      validate_build_definition required
-     handle_build 
+     handle_build
+     # debug only
+     [ "${KOSDEBUG}" == "1" ] && bash
      ;;
   buildpublish)
-     echo "kos_build_handler: build-publish"
+     echo "kos_build_handler: build and publish"
+     common_handling
+     validate_build_definition required
+     handle_build
+     handle_publish
+     # debug only
+     [ "${KOSDEBUG}" == "1" ] && bash
      ;;
   shell)
      echo "kos_build_handler: shell"
-     cd
-     handleSecrets     
-     copyAppToContainer
+     common_handling
      validate_build_definition notrequired
-     bash
+     bash   
      ;;
   *)
      echo "unknown goal $0"

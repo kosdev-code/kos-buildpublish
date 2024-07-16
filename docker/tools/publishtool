@@ -1,5 +1,4 @@
 #! /bin/sh
-
-set -e
+set -e -o pipefail
 
 java -jar /usr/local/lib/publishtool.jar $@

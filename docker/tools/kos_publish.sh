@@ -1,9 +1,9 @@
 #! /bin/bash
-
 set -e -o pipefail
+
 # This script handles the kos publish process, given a kosbuild json file.
 # Inputs: 
-#   - kosbuild.json file drives the publish process
+#   - <build definition json file> drives the publish process
 
 function usage() {
     echo "usage: $0 <kos build json file>"
@@ -103,8 +103,10 @@ function getRemoteFilename() {
   *) EXTENSION=""
   esac
 
-  echo "$0: KAB Version/Tag: $KABVERSION/$KABTAG"
-  REMOTE_FILENAME="${ARTIFACTNAME}-${KABTAG}-${KABVERSION}_${KABHASH}${EXTENSION}"
+  #echo "$0: KAB Version/Tag: $KABVERSION/$KABTAG"
+  #REMOTE_FILENAME="${ARTIFACTNAME}_${KABTAG}_${KABVERSION}_${KABHASH}${EXTENSION}"
+  echo "$0: KAB Version: $KABVERSION"
+  REMOTE_FILENAME="${ARTIFACTNAME}_${KABVERSION}_${KABHASH}${EXTENSION}"
 
   echo "remote filename: ${REMOTE_FILENAME}"
 }
@@ -132,7 +134,6 @@ for i in $( eval echo {0..$((ARTIFACT_COUNT-1))} ); do
    art_qualifier="any"
   fi
   
-
   echo 
   echo "-- kos-publish --"
   echo "$0 ${art_id} [${art_qualifier}] : ${art_filename}, ${art_repo}"
