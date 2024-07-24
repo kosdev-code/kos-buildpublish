@@ -100,8 +100,8 @@ Your repository must be configured for the kOS Build and publish process.  The k
 
   "artifacts": [
     {
-      "id": "demo-popa-rack-app",
-      "filename": "target/popa-rack-app-${KOS_STD_VERSION_REGEX}.kab",
+      "id": "demo-kos-app",
+      "filename": "target/demo-kos-app-${KOS_STD_VERSION_REGEX}.kab",
       "artifactstore": "kosDemos",
       "qualifier": "any"
     }
