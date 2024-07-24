@@ -2,7 +2,7 @@
 
 set -e -o pipefail
 
-# This script is the main entrypoint to performing a kOS build.
+# This script is the main entrypoint to performing a kOS build or publish
 # Installed to the docker image, this script will be called first when running the docker
 # image, and will set up the environment based on the goal.
 #
@@ -31,15 +31,16 @@ function copyAppToContainer() {
    echo "copying done..."
 }
 function validate_build_definition() {
-   # get the build definition 
+   # get the build definition
    [ -z "${BUILD_DEF}" ] && BUILD_DEF="kosbuild.json"
-   if [ ! -f "${BUILD_DEF}" ]; then 
+   if [ ! -f "${BUILD_DEF}" ]; then
       echo "build definition file ($BUILD_DEF) not found"
       if [ "$1" == "required" ]; then
           echo "error: need build definition"
           exit 1
       fi
    else
+      [ "${KOSDEBUG}" == "1" ] && echo "Debug: BUILD definition:" && cat "${BUILD_DEF}" | jq
       # get the default keyset, if specified
       default_keyset=$(jq -r ".default_keyset" "${BUILD_DEF}")
       if [ ! -z "${default_keyset}" ]; then
@@ -69,7 +70,7 @@ function common_handling() {
 }
 
 case $1 in
-  build) 
+  build)
      echo "kos_build_handler: build-only"
      common_handling
      validate_build_definition required
@@ -90,7 +91,7 @@ case $1 in
      echo "kos_build_handler: shell"
      common_handling
      validate_build_definition notrequired
-     bash   
+     bash
      ;;
   *)
      echo "unknown goal $0"

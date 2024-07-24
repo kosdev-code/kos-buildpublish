@@ -5,6 +5,8 @@ set -e -o pipefail
 # secrets directory contains the following files:
 #  npmrc         : NPM configuration file- will be placed in $HOME/.npmrc
 #  settings.xml  : Maven settings.xml file, will be placed in $HOME/.m2/settings.xml
+#  artifactstores/* : artifact store definitions
+#  keysets/*.keyset : keysets used for KAB creation
 
 function usage() {
     echo "usage: $0 <secrets directory>"
@@ -69,7 +71,12 @@ if [ -f "${SECRET_PASSWORD_FILE}" ]; then
     SECRET_PASSWORD=$(cat ${SECRET_PASSWORD_FILE})
     echo "using password from file ${SECRET_PASSWORD_FILE}"
 fi
-[ "${SECRET_PASSWORD}" != "" ] && SECRET_ARG_7Z="-p${SECRET_PASSWORD}"
+if [ "${SECRET_PASSWORD}" != "" ]; then
+SECRET_ARG_7Z="-p${SECRET_PASSWORD}"
+else
+echo "error: SECRET_PASSWORD not defined - define it or include a file ${SECRET_PASSWORD_FILE}"
+exit 1
+fi
 
 # save the secrets archive to a directory called secrets_mount, in a file called secrets.7z
 #  build the archive

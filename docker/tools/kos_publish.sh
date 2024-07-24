@@ -126,7 +126,7 @@ fi
 for i in $( eval echo {0..$((ARTIFACT_COUNT-1))} ); do  
   art_id=$(jq -r ".artifacts[$i].id" "${CFGFILE}")
   art_filename=$(jq -r ".artifacts[$i].filename" "${CFGFILE}")
-  art_repo=$(jq -r ".artifacts[$i].repo" "${CFGFILE}")
+  art_artstore=$(jq -r ".artifacts[$i].artifactstore" "${CFGFILE}")
   art_qualifier=$(jq -r ".artifacts[$i].qualifier" "${CFGFILE}")
 
   # if qualifier is unset, it's any
@@ -136,7 +136,7 @@ for i in $( eval echo {0..$((ARTIFACT_COUNT-1))} ); do
   
   echo 
   echo "-- kos-publish --"
-  echo "$0 ${art_id} [${art_qualifier}] : ${art_filename}, ${art_repo}"
+  echo "$0 ${art_id} [${art_qualifier}] : ${art_filename}, ${art_artstore}"
   # getFilename populates FILE_TO_PUBLISH with the exact file we're going to publish
   get_filename "${art_filename}"
 
@@ -144,7 +144,7 @@ for i in $( eval echo {0..$((ARTIFACT_COUNT-1))} ); do
   getRemoteFilename "${art_id}" "${FILE_TO_PUBLISH}"
 
   # upload the artifact to the repo
-  kos_upload_artifact "${FILE_TO_PUBLISH}" "${art_repo}" "${REMOTE_FILENAME}"
+  kos_upload_artifact "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
 
-  publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_repo}" "${REMOTE_FILENAME}"
+  publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
 done
