@@ -73,6 +73,11 @@ function validate_build_definition() {
          [ ! -f "${KEYSET_PATH}" ] && echo "keyset not found in ${KEYSET_PATH}" && exit 1
          mkdir -p "$HOME/kosStudio"
          echo "keyset = ${KEYSET_PATH}" > "${HOME}/kosStudio/tools.properties"
+         if [ "${GITHUB_ACTIONS}" == "true" ]; then
+            echo "==> kosStudio github actions workaround <=="
+            mkdir -p "/root/kosStudio"
+            ln -s -f "$HOME/kosStudio/tools.properties" "/root/kosStudio/tools.properties" 
+         fi
       fi
    fi
 }
@@ -119,6 +124,7 @@ case $1 in
      ;;
   automation)
      echo "kosbuild_handler: automation"
+     export
      handleSecrets
      validate_build_definition required
      handle_build
