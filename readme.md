@@ -133,7 +133,7 @@ In Build Automation mode, the automation runs as part of a CI action.  For this 
 The tooling expects 2 environment variables to be defined:
 
   - KOSBUILD_SECRET_PASSWORD is set to the password string for your secrets file
-  - KOSBUILD_SECRET_URL is the URL of the encrypted 7z file
+  - KOSBUILD_SECRET_URL is the URL of the encrypted 7z file (http/https)
 
 
 

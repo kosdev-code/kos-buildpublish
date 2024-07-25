@@ -14,6 +14,7 @@ echo "                              build def is the filename of the build defin
 echo "                              will default to kosbuild.json"
 echo "   buildpublish [build def] : this will build and publish the code in the current directory"
 echo "   shell                    : this will open a shell inside a temporary container for the kos-build image"
+echo "   automation               : this will run the automation goal, which includes build and publish"
 echo
 exit 1
 fi
@@ -21,7 +22,30 @@ fi
 BUILD_DEF="$2"
 
 function handleSecrets() {
-    load_secrets.sh /mnt/secrets/secrets.7z
+    if [ "${KOSBUILD_NO_SECRETS}" == "1" ]; then
+      echo "KOSBUILD_NO_SECRETS defined - secrets handling is bypassed"
+      return
+    fi
+    if [ -z "${KOSBUILD_SECRET_PASSWORD}" ]; then
+      echo "ERROR: KOSBUILD_SECRET_PASSWORD not defined"
+      exit 1
+    fi
+
+    LOCAL_SECRETS_FILE=/mnt/secrets/secrets.7z
+    if [ -f "${LOCAL_SECRETS_FILE}" ]; then
+       load_secrets.sh "${LOCAL_SECRETS_FILE}"
+    else
+       if [ ! -z "${KOSBUILD_SECRET_URL}" ]; then
+         DL_SECRETS_FILE="/tmp/secrets.7z"
+         echo "downloading secrets file from ${KOSBUILD_SECRET_URL}"
+         curl -f -o "${DL_SECRETS_FILE}" "${KOSBUILD_SECRET_URL}"
+         load_secrets.sh "${DL_SECRETS_FILE}"
+       else
+         echo "ERROR: No secrets file available.  Define KOSBUILD_SECRET_URL and KOSBUILD_SECRET_PASSWORD or include secrets file at ${LOCAL_SECRETS_FILE}"
+         exit 1
+       fi
+    fi
+    
 }
 function copyAppToContainer() {
    echo "kos_build_handler: copying app to the container... please wait."
@@ -92,6 +116,13 @@ case $1 in
      common_handling
      validate_build_definition notrequired
      bash
+     ;;
+  automation)
+     echo "kosbuild_handler: automation"
+     handleSecrets
+     validate_build_definition required
+     handle_build
+     handle_publish
      ;;
   *)
      echo "unknown goal $0"
