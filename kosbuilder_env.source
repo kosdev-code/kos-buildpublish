@@ -6,12 +6,12 @@ THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
 # SECRETS_MOUNT defines the location for kosbuilder to find the secrets.7z file
 SECRETS_MOUNT=${THIS_SCRIPT_DIR}/secrets/secrets_mount
 
-# SECRET_PASSWORD defines the password the the secrets.7z file
-export SECRET_PASSWORD=$(cat "${THIS_SCRIPT_DIR}/secrets/private/secrets_password")
+# KOSBUILD_SECRET_PASSWORD defines the password the the secrets.7z file
+export KOSBUILD_SECRET_PASSWORD=$(cat "${THIS_SCRIPT_DIR}/secrets/private/secrets_password")
 
 # we were going to use a simple alias
-alias kosbuild="docker run -it --rm -e SECRET_PASSWORD=${SECRET_PASSWORD} -v "'`pwd`'":/app -v ${SECRETS_MOUNT}:/mnt/secrets kosbuilder"
-alias kosbuild_debug="docker run -it --rm -e KOSDEBUG=1 -e SECRET_PASSWORD=${SECRET_PASSWORD} -v "'`pwd`'":/app -v ${SECRETS_MOUNT}:/mnt/secrets kosbuilder"
+alias kosbuild="docker run -it --rm -e KOSBUILD_SECRET_PASSWORD=${KOSBUILD_SECRET_PASSWORD} -v "'`pwd`'":/app -v ${SECRETS_MOUNT}:/mnt/secrets kosbuilder"
+alias kosbuild_debug="docker run -it --rm -e KOSDEBUG=1 -e KOSBUILD_SECRET_PASSWORD=${KOSBUILD_SECRET_PASSWORD} -v "'`pwd`'":/app -v ${SECRETS_MOUNT}:/mnt/secrets kosbuilder"
 
 # prefix the bash prompt with "kosbuilder-env"
 if [[ $PS1 != *kosbuilder-env* ]]; then

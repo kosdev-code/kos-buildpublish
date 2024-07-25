@@ -68,13 +68,13 @@ fi
 # capture the password argument
 SECRET_PASSWORD_FILE="${SECRETS_DIR}/secrets_password"
 if [ -f "${SECRET_PASSWORD_FILE}" ]; then
-    SECRET_PASSWORD=$(cat ${SECRET_PASSWORD_FILE})
+    KOSBUILD_SECRET_PASSWORD=$(cat ${SECRET_PASSWORD_FILE})
     echo "using password from file ${SECRET_PASSWORD_FILE}"
 fi
-if [ "${SECRET_PASSWORD}" != "" ]; then
-SECRET_ARG_7Z="-p${SECRET_PASSWORD}"
+if [ "${KOSBUILD_SECRET_PASSWORD}" != "" ]; then
+SECRET_ARG_7Z="-p${KOSBUILD_SECRET_PASSWORD}"
 else
-echo "error: SECRET_PASSWORD not defined - define it or include a file ${SECRET_PASSWORD_FILE}"
+echo "error: KOSBUILD_SECRET_PASSWORD not defined - define it or include a file ${SECRET_PASSWORD_FILE}"
 exit 1
 fi
 

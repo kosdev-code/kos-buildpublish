@@ -4,8 +4,8 @@ set -e -o pipefail
 
 function usage() {
     echo "usage: $0 <secrets file>"
-    echo "  if you wish to use a password to decrypt the file, you would add that secret to the environment with name SECRET_PASSWORD."
-    echo "  e.g. SECRET_PASSWORD=mypassword $0 <secrets file>"
+    echo "  if you wish to use a password to decrypt the file, you would add that secret to the environment with name KOSBUILD_SECRET_PASSWORD."
+    echo "  e.g. KOSBUILD_SECRET_PASSWORD=mypassword $0 <secrets file>"
 }
 
 if [ $# -lt 1 ]; then
@@ -24,7 +24,7 @@ ARTIFACTSTORES="artifactstores"
 # extract the secrets to EXTRACT_DIR
 EXTRACT_DIR=/tmp/secrets
 ## build our password parameter
-[ ! -z "${SECRET_PASSWORD}" ] && SECRET_ARG_7Z="-p${SECRET_PASSWORD}"
+[ ! -z "${KOSBUILD_SECRET_PASSWORD}" ] && SECRET_ARG_7Z="-p${KOSBUILD_SECRET_PASSWORD}"
 ## remove the output directory if it exists already
 rm -rf "${EXTRACT_DIR}"
 ## extract the archive
