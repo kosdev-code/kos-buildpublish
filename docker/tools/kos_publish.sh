@@ -29,12 +29,18 @@ function publish_artifact() {
     local FILENAME="$3"
     local REPO="$4"
     local REMOTE_FILENAME="$5"
+    local IS_MARKETPLACE="$6"
     
+    if [ $IS_MARKETPLACE -eq 1 ]; then
+        IS_MARKETPLACE="--marketplace"
+    else
+        unset IS_MARKETPLACE
+    fi
     ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
     # get the container and token
     ARTSTORE_APIKEY="$(jq -r '.["studio-apikey"]' "${ARTSTORE_FILENAME}")"
     echo "publish artifact: ${ID}, ${ART_QUALIFIER}, ${FILENAME}, ${REPO} ${REMOTE_FILENAME}"
-    publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" "${FILENAME}"
+    publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
     echo 
     local SERVER_COUNT=$(jq '.additional_publish_servers | length' ${ARTSTORE_FILENAME})
     local j
@@ -43,7 +49,7 @@ function publish_artifact() {
         local SERVER=$(jq -r ".additional_publish_servers[$j]" ${ARTSTORE_FILENAME})
         
         echo "-- publish artifact to ${SERVER} -- "
-        publishtool --server="${SERVER}" -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" "${FILENAME}"
+        publishtool --server="${SERVER}" -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
         echo 
       done 
     fi
@@ -128,12 +134,18 @@ for i in $( eval echo {0..$((ARTIFACT_COUNT-1))} ); do
   art_filename=$(jq -r ".artifacts[$i].filename" "${CFGFILE}")
   art_artstore=$(jq -r ".artifacts[$i].artifactstore" "${CFGFILE}")
   art_qualifier=$(jq -r ".artifacts[$i].qualifier" "${CFGFILE}")
+  art_marketplace=$(jq -r ".artifacts[$i].marketplace" "${CFGFILE}")
 
   # if qualifier is unset, it's any
   if [[ "${art_qualifier}" == "null" ]]; then 
    art_qualifier="any"
   fi
-  
+  # if marketplace is unset, it's any
+  if [[ "${art_marketplace}" == "null" ]]; then 
+   art_marketplace=0
+  fi
+
+
   echo 
   echo "-- kos-publish --"
   echo "$0 ${art_id} [${art_qualifier}] : ${art_filename}, ${art_artstore}"
@@ -146,5 +158,5 @@ for i in $( eval echo {0..$((ARTIFACT_COUNT-1))} ); do
   # upload the artifact to the repo
   kos_upload_artifact "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
 
-  publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
+  publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}" ${art_marketplace}
 done
