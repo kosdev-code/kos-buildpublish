@@ -14,6 +14,9 @@ if [ $# -lt 1 ]; then
 fi
 SECRETS_ARCHIVE="$1"
 
+# output the sha256sum of the secrets archive so we have ability to debug
+sha256sum "${SECRETS_ARCHIVE}"
+
 # define the files we will process
 NPMRC_FILE="npmrc"
 MVNSETTINGS_FILE="settings.xml"
@@ -43,6 +46,11 @@ fi
 if [ -f "${EXTRACT_DIR}/${MVNSETTINGS_FILE}" ]; then
     mkdir -p $HOME/.m2
     mv "${EXTRACT_DIR}/${MVNSETTINGS_FILE}" $HOME/.m2
+    if [ "${GITHUB_ACTIONS}" == "true" ]; then
+        echo "==> m2 github actions workaround <=="
+        mkdir -p "/root/.m2"
+        ln -s -f "$HOME/.m2/settings.xml" "/root/.m2/settings.xml"
+    fi
 fi
 
 ## keysets folder

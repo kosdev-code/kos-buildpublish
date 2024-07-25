@@ -9,15 +9,18 @@ set -e -o pipefail
 #  keysets/*.keyset : keysets used for KAB creation
 
 function usage() {
-    echo "usage: $0 <secrets directory>"
+    echo "usage: $0 <secrets directory> [secrets-output file]"
 }
 
 if [ $# -lt 1 ]; then
   usage
   exit 1
 fi
-
+OUTPUT_FILE="$(pwd)/secrets_mount/secrets.7z"
 SECRETS_DIR="$1"
+if [ $# -gt 1 ]; then
+OUTPUT_FILE="$(realpath $2)"
+fi
 
 # confirm that the secrets directory is actually a directory.
 if [ ! -d "${SECRETS_DIR}" ]; then
@@ -81,7 +84,6 @@ fi
 # save the secrets archive to a directory called secrets_mount, in a file called secrets.7z
 #  build the archive
 mkdir -p $(pwd)/secrets_mount
-OUTPUT_FILE="$(pwd)/secrets_mount/secrets.7z"
 rm -f "${OUTPUT_FILE}"
 pushd "${SECRETS_DIR}"
 7z a -t7z -mhe ${SECRET_ARG_7Z} "${OUTPUT_FILE}" ${ALLFILES}
