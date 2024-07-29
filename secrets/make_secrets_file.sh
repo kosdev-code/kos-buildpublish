@@ -16,8 +16,8 @@ if [ $# -lt 1 ]; then
   usage
   exit 1
 fi
-OUTPUT_FILE="$(pwd)/secrets_mount/secrets.7z"
 SECRETS_DIR="$1"
+OUTPUT_FILE="$(pwd)/secrets_mount/$(basename ${SECRETS_DIR})-secrets.7z"
 if [ $# -gt 1 ]; then
 OUTPUT_FILE="$(realpath $2)"
 fi
@@ -83,10 +83,8 @@ fi
 
 # save the secrets archive to a directory called secrets_mount, in a file called secrets.7z
 #  build the archive
-mkdir -p $(pwd)/secrets_mount
+mkdir -p "$(dirname "${OUTPUT_FILE}")"
 rm -f "${OUTPUT_FILE}"
 pushd "${SECRETS_DIR}"
 7z a -t7z -mhe ${SECRET_ARG_7Z} "${OUTPUT_FILE}" ${ALLFILES}
 popd
-
-
