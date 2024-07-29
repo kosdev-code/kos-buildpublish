@@ -27,7 +27,7 @@ fi
 pushd "${TMPDIR}"
 zip -Z store tmp.zip layer.img
 # add descriptor if we have it.
-[ ! -z "${DESCRIPTOR}" ] && zip -Z store descriptor.json
+[ ! -z "${DESCRIPTOR}" ] && zip -Z store tmp.zip descriptor.json
 kabtool -b -t kos.layer -v "${VERSION}" -z tmp.zip layer.kab
 popd
 
