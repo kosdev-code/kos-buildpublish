@@ -23,6 +23,6 @@ ARTSTORE_SASTOKEN=$(jq -r ".sastoken" "${ARTSTORE_FILENAME}")
 REMOTEURL="${ARTSTORE_CONTAINER}/${REMOTEFILENAME}?${ARTSTORE_SASTOKEN}"
 
 echo "uploading to azure container using azcopy..."
-echo azcopy cp --log-level=NONE --output-level=essential --skip-version-check "${KABFILE}" "${REMOTEURL}"
+azcopy cp --log-level=NONE --output-level=essential --skip-version-check "${KABFILE}" "${REMOTEURL}"
 
 echo "upload complete"
