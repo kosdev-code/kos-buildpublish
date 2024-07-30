@@ -50,7 +50,7 @@ function handleSecrets() {
 function copyAppToContainer() {
    echo "kos_build_handler: copying app to the container... please wait."
    mkdir -p ~/work
-   cp -r /app/* ~/work
+   cp -a /app/. ~/work
    cd ~/work
    echo "copying done..."
 }
