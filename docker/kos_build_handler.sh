@@ -83,9 +83,7 @@ function validate_build_definition() {
 }
 
 function handle_build() {
-   local BUILD_CMD=$(jq -r ".build_cmd" "${BUILD_DEF}")
-   echo "kos_build_handler: building with command: ${BUILD_CMD}"
-   "${BUILD_CMD}"
+   kos_build.sh "${BUILD_DEF}"
 }
 
 function handle_publish() {

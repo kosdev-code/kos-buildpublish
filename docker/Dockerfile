@@ -54,6 +54,7 @@ COPY tools/kabtool     /usr/local/bin
 
 COPY tools/load_secrets.sh /usr/local/bin 
 COPY tools/kos_publish.sh /usr/local/bin
+COPY tools/kos_build.sh /usr/local/bin
 COPY tools/kos_upload_artifact /usr/local/bin
 COPY tools/kos_artstore_upload_azure_container.sh /usr/local/bin
 COPY tools/kos_make_descriptorjson.sh /usr/local/bin
