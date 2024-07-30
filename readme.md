@@ -344,7 +344,7 @@ Assume that you have an NPM or Java repository on your developer machine that wi
 
   The artifact is defined and the artifactstore value matches to a file 'repo-myorg.json' contained in the secrets archive.
 
-8. Finally, create a workflow file in your repository called .github/workflows/kosbuild.yml that triggers the build on pushes to the main branch.
+8. Finally, create a workflow file in your repository called `.github/workflows/kosbuild.yml` (or similar) that triggers the build on pushes to the main branch.
 
 ```
 name: kos-build
