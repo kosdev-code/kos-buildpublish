@@ -17,8 +17,8 @@ fi
 
 ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
 # get the container and token
-ARTSTORE_CONTAINER=$(jq -r ".container" "${ARTSTORE_FILENAME}")   
-ARTSTORE_SASTOKEN=$(jq -r ".sastoken" "${ARTSTORE_FILENAME}")   
+ARTSTORE_CONTAINER=$(jq -r ".container" "${ARTSTORE_FILENAME}")
+ARTSTORE_SASTOKEN=$(jq -r ".sastoken" "${ARTSTORE_FILENAME}")
 
 REMOTEURL="${ARTSTORE_CONTAINER}/${REMOTEFILENAME}?${ARTSTORE_SASTOKEN}"
 

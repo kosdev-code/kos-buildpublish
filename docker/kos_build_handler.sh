@@ -45,12 +45,14 @@ function handleSecrets() {
          exit 1
        fi
     fi
+    # remove KOSBUILD_SECRET_PASSWORD export
+    export -n KOSBUILD_SECRET_PASSWORD
     
 }
 function copyAppToContainer() {
    echo "kos_build_handler: copying app to the container... please wait."
    mkdir -p ~/work
-   cp -a /app/. ~/work
+   cp -a --no-preserve=owner /app/. ~/work
    cd ~/work
    echo "copying done..."
 }
@@ -67,7 +69,7 @@ function validate_build_definition() {
       [ "${KOSDEBUG}" == "1" ] && echo "Debug: BUILD definition:" && cat "${BUILD_DEF}" | jq
       # get the default keyset, if specified
       default_keyset=$(jq -r ".default_keyset" "${BUILD_DEF}")
-      if [ ! -z "${default_keyset}" ]; then
+      if [ "${default_keyset}" != "null" ]; then
          # setup the default keyset such that studio tools work with it
          local KEYSET_PATH="$HOME/.kosbuild/keysets/${default_keyset}.keyset"
          [ ! -f "${KEYSET_PATH}" ] && echo "keyset not found in ${KEYSET_PATH}" && exit 1
@@ -78,6 +80,8 @@ function validate_build_definition() {
             mkdir -p "/root/kosStudio"
             ln -s -f "$HOME/kosStudio/tools.properties" "/root/kosStudio/tools.properties" 
          fi
+      else
+         echo "WARNING: no default_keyset found in build definition file ${BUILD_DEF}"
       fi
    fi
 }
@@ -122,8 +126,8 @@ case $1 in
      ;;
   automation)
      echo "kosbuild_handler: automation"
-     export
      handleSecrets
+     export
      validate_build_definition required
      handle_build
      handle_publish

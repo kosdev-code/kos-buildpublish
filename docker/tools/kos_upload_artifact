@@ -18,7 +18,7 @@ fi
 
 function getArtifactStoreType() {
     ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
-    ARTSTORE_TYPE=$(jq -r ".type" < "${ARTSTORE_FILENAME}")    
+    ARTSTORE_TYPE=$(jq -r ".type" < "${ARTSTORE_FILENAME}")
 }
 
 # get the artifact store type
