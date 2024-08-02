@@ -60,8 +60,10 @@ Template (comments may not exist in the JSON):
     "studio-apikey": "<api key for publishing to Studio>",      # [REQUIRED]
     
     "additional_publish_servers": [                             # [OPTIONAL] add these only if you are publishing to additional servers
-        "<publish server1>",                                    #            we will always publish to the public studio server
-        "<publish server2>"
+        {
+          "server": "wss://additionalserver.com",
+          "apikey": "<api key for publishing on additional server>" # additional server api key will default to "studio-apikey" if not specified
+        }
     ],
 
     # The following keys are required when the type is azurecontainer:

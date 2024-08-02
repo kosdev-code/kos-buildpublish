@@ -38,20 +38,39 @@ function publish_artifact() {
     ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
     # get the container and token
     ARTSTORE_APIKEY="$(jq -r '.["studio-apikey"]' "${ARTSTORE_FILENAME}")"
+
     echo "publish artifact: ${ID}, ${ART_QUALIFIER}, ${FILENAME}, ${REPO} ${REMOTE_FILENAME}"
-    publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
-    echo
+
+    # default publish
+    if [ "${ARTSTORE_APIKEY}" == "null" ]; then
+       echo "WARNING: no studio-apikey specified.  Skipping default publish"
+    else
+      # skip publishtool hack
+      publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+      echo
+    fi
+
     local SERVER_COUNT 
     SERVER_COUNT=$(jq '.additional_publish_servers | length' ${ARTSTORE_FILENAME})
     local j
     if [ $SERVER_COUNT -ne 0 ]; then
       for j in $( eval echo {0..$((SERVER_COUNT-1))} ); do
         local SERVER
-        SERVER=$(jq -r ".additional_publish_servers[$j]" ${ARTSTORE_FILENAME})
+        local SERVER_API_KEY
 
-        echo "-- publish artifact to ${SERVER} -- "
-        publishtool --server="${SERVER}" -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
-        echo
+        # handle additional publish servers
+        SERVER=$(jq -r ".additional_publish_servers[$j].server" ${ARTSTORE_FILENAME})
+        SERVER_API_KEY=$(jq -r ".additional_publish_servers[$j].apikey" ${ARTSTORE_FILENAME})
+        if [ "${SERVER_API_KEY}" == "null" ] && [ "${ARTSTORE_API_KEY}" != "null" ]; then
+           SERVER_API_KEY="${ARTSTORE_APIKEY}"
+        fi
+
+        # publish to the additional server
+        if [ "${SERVER_API_KEY}" != "null" ]; then
+          echo "-- publish artifact to ${SERVER} -- "
+          publishtool --server="${SERVER}" -a "${SERVER_API_KEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+          echo
+        fi
       done
     fi
 }
