@@ -57,7 +57,7 @@ function copyAppToContainer() {
    echo "copying done..."
 }
 function validate_build_definition() {
-   # get the build definition
+   # get the build definition, default to kosbuild.json
    [ -z "${BUILD_DEF}" ] && BUILD_DEF="kosbuild.json"
    if [ ! -f "${BUILD_DEF}" ]; then
       echo "build definition file ($BUILD_DEF) not found"
@@ -66,6 +66,7 @@ function validate_build_definition() {
           exit 1
       fi
    else
+      export KOSBUILD_BUILD_DEFINITION="$(realpath "${BUILD_DEF}")"
       [ "${KOSDEBUG}" == "1" ] && echo "Debug: BUILD definition:" && cat "${BUILD_DEF}" | jq
       # get the default keyset, if specified
       default_keyset=$(jq -r ".default_keyset" "${BUILD_DEF}")

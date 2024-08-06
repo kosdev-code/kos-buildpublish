@@ -6,17 +6,18 @@ set -e -o pipefail
 #   - <build definition json file> drives the publish process
 
 function usage() {
-    echo "usage: $0 <kos build configuration json file>"
+    echo "usage: $0 [kos build configuration json file]"
 }
-
-if [ $# -lt 1 ]; then
-  usage
-  exit 1
-fi
 
 CFGFILE=$1
 
+if [ "${CFGFILE}" == "" ] && [ "${KOSBUILD_BUILD_DEFINITION}" != "" ]; then
+CFGFILE="${KOSBUILD_BUILD_DEFINITION}"
+fi
+
+
 if [ ! -f "${CFGFILE}" ]; then
+  echo "Error: build definition not found (${CFGFILE})"
   usage
   exit 1
 fi

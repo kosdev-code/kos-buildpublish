@@ -6,20 +6,22 @@ set -e -o pipefail
 #   - <build definition json file> drives the publish process
 
 function usage() {
-    echo "usage: $0 <kos build json file>"
+    echo "usage: $0 [kos build json file]"
 }
-
-if [ $# -lt 1 ]; then
-  usage
-  exit 1
-fi
 
 BUILD_DEF=$1
 
+if [ "${BUILD_DEF}" == "" ] && [ "${KOSBUILD_BUILD_DEFINITION}" != "" ]; then
+BUILD_DEF="${KOSBUILD_BUILD_DEFINITION}"
+fi
+
+
 if [ ! -f "${BUILD_DEF}" ]; then
+  echo "Error: build definition not found: (${CFGFILE})"
   usage
   exit 1
 fi
+
 
 # function to publish the artifact to studio server
 function publish_artifact() {
@@ -189,7 +191,10 @@ function publish_artifact_per_configfile() {
 }
 
 ###  SHELL SCRIPT starts here:
+echo "******** PUBLISH *********"
 export BUILD_DEFINITION="${BUILD_DEF}"
+echo " => ${BUILD_DEFINITION}"
+
 PREPUBLISH_CMD=$(jq -r ".prepublish_cmd" "${BUILD_DEF}")
 if [ "${PREPUBLISH_CMD}" != "null" ]; then
   echo "kos_publish.sh: pre-publish with command ${PREPUBLISH_CMD}"

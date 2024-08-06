@@ -10,6 +10,7 @@ PASSWORD="$2"
 
 mkdir -p "${ORGNAME}/artifactstores"
 mkdir -p "${ORGNAME}/keysets"
+mkdir -p "${ORGNAME}/usersecrets"
 
 # create password if it doesn't exist
 SECRETS_FILENAME="${ORGNAME}/secrets_password"

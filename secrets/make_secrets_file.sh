@@ -33,6 +33,7 @@ NPMRC_FILE="npmrc"
 MVNSETTINGS_FILE="settings.xml"
 KEYSETS_DIR="keysets"
 ARTIFACTSTORES="artifactstores"
+USERSECRETS="usersecrets"
 
 ALLFILES=""
 
@@ -64,6 +65,11 @@ if [ -d "${SECRETS_DIR}/${ARTIFACTSTORES}" ]; then
   ALLFILES="${ALLFILES} ${ARTIFACTSTORES}"
 else
   echo "artifactstores directory not found in secrets"
+fi
+
+if [ -d "${SECRETS_DIR}/${USERSECRETS}" ]; then
+  echo "usersecrets directory found"
+  ALLFILES="${ALLFILES} ${USERSECRETS}"
 fi
 
 ## create the 7z encrypted file

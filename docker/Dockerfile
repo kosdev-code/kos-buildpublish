@@ -26,7 +26,8 @@ ENV KOS_INSTALL_PATH="/usr/local"
 
 # Install 7z
 RUN apt-get update && \
-    apt-get install -y p7zip-full jq curl unzip git-lfs squashfs-tools-ng zip xmlstarlet && \
+    apt-get install -y p7zip-full jq curl unzip git-lfs squashfs-tools-ng zip zstd xmlstarlet &&  \
+    apt-get install -y golang nsis && \
     rm -rf /var/lib/apt/lists/*
 
 # Define the version of azcopy to download
