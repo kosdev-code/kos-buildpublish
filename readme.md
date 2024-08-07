@@ -78,7 +78,9 @@ Example:
     "container": "https://sause2tcccknaprod0001.blob.core.windows.net/artifacts-kosdemo",
     "sastoken": "sp=r&st=2024-07-03T16:34:33Z&se=2024-07-07T00:34:33Z&spr=https&sv=2022-11-02&sr=c&sig=npz%2FWpuSZ7wFkmuMAHGcUgtEL3CH2i%2FvUxeo0x%2BwIN0%3D",
     "additional_publish_servers": [
-        "wss://studiotest.kosdev.com"
+      {
+        "server": "wss://studiotest.kosdev.com"
+      }
     ]
 }
 ```
@@ -385,3 +387,7 @@ jobs:
 
 9. When you push to the main branch of your repository, automation will automatically start to build and publish your artifacts.
 
+###
+TODO
+
+Document deployment of extra resources using kos_deploy_to_artifactstore
