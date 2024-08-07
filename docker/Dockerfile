@@ -26,7 +26,7 @@ ENV KOS_INSTALL_PATH="/usr/local"
 
 # Install 7z
 RUN apt-get update && \
-    apt-get install -y p7zip-full jq curl unzip git-lfs squashfs-tools-ng zip zstd xmlstarlet &&  \
+    apt-get install -y p7zip-full jq curl unzip git-lfs squashfs-tools-ng zip zstd xmlstarlet gettext &&  \
     apt-get install -y golang nsis && \
     rm -rf /var/lib/apt/lists/*
 
@@ -57,6 +57,7 @@ COPY tools/load_secrets.sh /usr/local/bin
 COPY tools/kos_publish.sh /usr/local/bin
 COPY tools/kos_build.sh /usr/local/bin
 COPY tools/kos_upload_artifact /usr/local/bin
+COPY tools/kos_deploy_to_artifactstore.sh /usr/local/bin
 COPY tools/kos_artstore_upload_azure_container.sh /usr/local/bin
 COPY tools/kos_make_descriptorjson.sh /usr/local/bin
 COPY tools/kos_squash_to_kab.sh /usr/local/bin

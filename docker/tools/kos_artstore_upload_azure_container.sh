@@ -2,11 +2,11 @@
 set -e -o pipefail
 
 function usage() {
-    echo "$0 <kab filename> <repo> <remotefilename>"
+    echo "$0 <local filename> <repo> <remotefilename>"
     echo " will upload the file to an azure container"
 }
 
-KABFILE="$1"
+LOCALFILE="$1"
 REPO="$2"
 REMOTEFILENAME="$3"
 
@@ -22,7 +22,7 @@ ARTSTORE_SASTOKEN=$(jq -r ".sastoken" "${ARTSTORE_FILENAME}")
 
 REMOTEURL="${ARTSTORE_CONTAINER}/${REMOTEFILENAME}?${ARTSTORE_SASTOKEN}"
 
-echo "uploading to azure container using azcopy..."
-azcopy cp --log-level=NONE --output-level=essential --skip-version-check "${KABFILE}" "${REMOTEURL}"
+echo "uploading ${LOCALFILE} to azure container ${ARTSTORE_CONTAINER} using azcopy..."
+azcopy cp --log-level=NONE --output-level=essential --skip-version-check "${LOCALFILE}" "${REMOTEURL}"
 
 echo "upload complete"
