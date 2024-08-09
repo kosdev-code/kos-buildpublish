@@ -61,6 +61,7 @@ COPY tools/kos_deploy_to_artifactstore.sh /usr/local/bin
 COPY tools/kos_artstore_upload_azure_container.sh /usr/local/bin
 COPY tools/kos_make_descriptorjson.sh /usr/local/bin
 COPY tools/kos_squash_to_kab.sh /usr/local/bin
+COPY tools/central_maven_send.sh /usr/local/bin
 
 COPY kos_build_handler.sh /usr/local/bin
 

@@ -33,6 +33,7 @@ function handle_build() {
 
    PREBUILD_CMD=$(jq -r ".prebuild_cmd" "${BUILD_DEF}")
    if [ "${PREBUILD_CMD}" != "null" ]; then
+     echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: prebuild with command ${PREBUILD_CMD}"
      ${PREBUILD_CMD}
    fi
@@ -42,11 +43,13 @@ function handle_build() {
      echo "error: no build_cmd found in build definition, ${BUILD_DEF}"
      exit 1
    fi
+   echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
    echo "kos_build_handler: building with command: ${BUILD_CMD}"
    ${BUILD_CMD}
 
    POSTBUILD_CMD=$(jq -r ".postbuild_cmd" "${BUILD_DEF}")
    if [ "${POSTBUILD_CMD}" != "null" ]; then
+     echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: postbuild with command ${POSTBUILD_CMD}"
      ${POSTBUILD_CMD}
    fi

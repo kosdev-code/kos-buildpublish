@@ -103,6 +103,7 @@ function common_handling() {
 
 case $1 in
   build)
+     echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: build-only"
      common_handling
      validate_build_definition required
@@ -111,6 +112,7 @@ case $1 in
      [ "${KOSDEBUG}" == "1" ] && bash
      ;;
   buildpublish)
+     echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: build and publish"
      common_handling
      validate_build_definition required
@@ -120,12 +122,14 @@ case $1 in
      [ "${KOSDEBUG}" == "1" ] && bash
      ;;
   shell)
+     echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: shell"
      common_handling
      validate_build_definition notrequired
      bash
      ;;
   automation)
+     echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kosbuild_handler: automation"
      handleSecrets
      export

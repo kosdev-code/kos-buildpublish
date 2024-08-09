@@ -1,4 +1,6 @@
 #! /bin/bash
+THIS_SCRIPT=$(realpath "$0")
+THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
 
 set -e -o pipefail
 
@@ -94,3 +96,7 @@ rm -f "${OUTPUT_FILE}"
 pushd "${SECRETS_DIR}"
 7z a -t7z -mhe ${SECRET_ARG_7Z} "${OUTPUT_FILE}" ${ALLFILES}
 popd
+
+# replace the secrets.7z file
+cp "${OUTPUT_FILE}" "${THIS_SCRIPT_DIR}/secrets_mount/secrets.7z"
+

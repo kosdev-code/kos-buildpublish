@@ -75,3 +75,12 @@ chmod 0700 "${HOME}/.kosbuild"
 
 ## cleanup
 rm -rf ${EXTRACT_DIR}
+
+# run secrets_init if it exists
+SECRETS_INIT_FILE="${HOME}/.kosbuild/${USERSECRETS}/secrets_init"
+if [ -f "${SECRETS_INIT_FILE}" ]; then
+    chmod +x "${SECRETS_INIT_FILE}"
+    echo "$0: executing secrets init..."
+    ${SECRETS_INIT_FILE}
+    echo "$0: secrets init done"
+fi
