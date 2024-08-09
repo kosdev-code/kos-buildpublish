@@ -81,6 +81,14 @@ function validate_build_definition() {
             mkdir -p "/root/kosStudio"
             ln -s -f "$HOME/kosStudio/tools.properties" "/root/kosStudio/tools.properties" 
          fi
+
+         # hook onload 
+         ONLOAD_CMD=$(jq -r ".onload_cmd" "${BUILD_DEF}")
+         if [ "${ONLOAD_CMD}" != "null" ]; then
+            echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
+            echo "kos_build_handler: onload with command ${ONLOAD_CMD}"
+            ${ONLOAD_CMD}
+         fi
       else
          echo "WARNING: no default_keyset found in build definition file ${BUILD_DEF}"
       fi
