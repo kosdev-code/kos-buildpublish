@@ -5,6 +5,7 @@ set -e -o pipefail
 if [ $# -lt 3 ]; then
 echo "usage: $0 <squash file> <output kab> <KAB version> [descriptor.json path]"
 echo "  packages the squash file as a KAB"
+echo "  if KAB_TAG is specified in the environment, it will be applied to the KAB file"
 exit 1
 fi
 
@@ -28,7 +29,12 @@ pushd "${TMPDIR}"
 zip -Z store tmp.zip layer.img
 # add descriptor if we have it.
 [ ! -z "${DESCRIPTOR}" ] && zip -Z store tmp.zip descriptor.json
-kabtool -b -t kos.layer -v "${VERSION}" -z tmp.zip layer.kab
+
+if [ "${KAB_TAG}" != "" ]; then
+  kabtool -b -t kos.layer -v "${VERSION}" -q "${KAB_TAG}" -z tmp.zip layer.kab
+else
+  kabtool -b -t kos.layer -v "${VERSION}" -z tmp.zip layer.kab
+fi
 popd
 
 # put the KAB where it needs to go and remove temporary files
