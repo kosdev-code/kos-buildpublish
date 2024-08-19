@@ -10,6 +10,8 @@ At a high-level, with this tooling, we can:
 
 This process can be run on your local development system or can be deployed into Automation.
 
+A walkthrough is available at the end of this file.
+
 ## Requirements
 
   * For an interactive use case, Docker must installed on your host machine { Docker has been tested on Linux, Windows, and MacOS }
@@ -22,6 +24,10 @@ This process can be run on your local development system or can be deployed into
   * For publishing, you must have access to a storage account where you can publish artifacts.  We currently support Azure Blob Storage accounts. 
   * For automation, we currently have templates available for Github.
   * The software source code should be saved to a git repository, and must be producing a KAB or multiple KABs.  The Docker image supports both NPM and Maven builds.
+  * You must generate a secrets file that contains your keysets and your artifact store definition(s).  You may also include credentials or other items in your secrets file that is required for building.
+
+## Process
+
 
 ## Secrets
  
@@ -32,18 +38,22 @@ This process can be run on your local development system or can be deployed into
   3. Studio Server API Key for publishing
   4. [Optional] Maven Settings file (settings.xml normally found in your ~/.m2 folder) - if required for building your code
   5. [Optional] npmrc file that configures repositories and secrets for NPM - if required for building your code
+  6. [Optional] usersecrets directory can be used for any secrets/items you wish to include in your build automation that is not included in the above.  This is unstructured.
 
 As part of the build and publish process, you must configure a folder containing your secrets.  It follows the following structure
 
 ```
    artifactstores/     [Directory containing configuration for Artifact Stores]
    keysets/            [Directory containing keysets used for KAB signing]
+   usersecrets/        [Optional Directory containing secrets or files that you wish to use during the build process]
    npmrc               [Optional, npmrc file]
    settings.xml        [Optional, maven settings file]
    secrets_password    [Text file containing the password to the Secrets file]
 ```
 
 This folder is then transformed into an encrypted 7z file with the provided script `make_secrets_file.sh` for use by the build process.  The secrets_password file is not included in the encrypted 7z file, but is used by tooling to create the secrets file and to run the build process locally.
+
+Details on the secrets directory follows:
 
 ### Keyset
 
@@ -58,6 +68,7 @@ Template (comments may not exist in the JSON):
 {
     "type": "<type of container>",                              # [REQUIRED] Supported options: { azurecontainer }
     "studio-apikey": "<api key for publishing to Studio>",      # [REQUIRED]
+    "market": <true or false>                                   # [OPTIONAL] set to true if the repo is a store for market artifacts.  Defaults to false.  This is used for garbage collection tooling.
     
     "additional_publish_servers": [                             # [OPTIONAL] add these only if you are publishing to additional servers
         {
@@ -85,6 +96,10 @@ Example:
 }
 ```
 
+### User Secrets
+
+Every build process is different.  If you have additional secrets that do not fit into our categories above, you can set them in the usersecrets/ folder and they will be copied out to $HOME/.kosbuild/usersecrets when the secrets are loaded.  Additionally, if you put an executable file in this folder called secrets_init, it will be run automatically after the secrets are loaded.
+
 ### Secrets file creation
 
 Use the `make_secrets_file.sh` script in the secrets/ folder of this repo to create an encrypted 7z file with the secrets folder.  The script takes the path to the secrets folder that you have created and an optional output filename.
@@ -94,6 +109,8 @@ usage: ./make_secrets_file.sh <secrets directory> [secrets-output file]
 ```
 
 You must have either have a file in the secrets folder called, "secrets_password" or an environment variable, KOSBUILD_SECRETS_PASSWORD, defined when running the make_secrets_file.sh.  This password is applied to the 7z file and is required for decryption.
+
+If you do not specify a "secrets-output file", it will output the secrets to the secrets_mount folder.  Your secrets file can then easily be used for local builds with the provided scripts.
 
 
 ## Docker Image
@@ -124,11 +141,19 @@ Your repository must be configured for the kOS Build and Publish process.  A bui
 
 Each key is described below:
 
-    default_keyset: Defines the keyset that will be used by kabtool when generating KAB files.  The default_keyset value drives how the contents of the ~/kosStudio/tools.properties file to set the keyset.
+    default_keyset: Defines the keyset that will be used by kabtool when generating KAB files.  The default_keyset value drives the contents of the ~/kosStudio/tools.properties file to set the keyset.
 
-    prebuild_cmd: [OPTIONAL] : this is called before the *build_cmd*.  No action is taken if this is not set.
+    onload_cmd: [OPTIONAL] When executing the kos_build_handler, after the secrets have been loaded, this onload_cmd is run automatically.  You may use this to initialize your environment or add additional set-up should you need to do so.
 
-    build_cmd: Defines the script used to build the code in the repository.
+    prebuild_cmd: [OPTIONAL]  When the build goal is taken, this is called before the *build_cmd*.  No action is taken if this is not set.
+
+    build_cmd: When the build goal is taken, this defines the command used to build the code in the repository.
+    
+    postbuild_cmd: [OPTIONAL] When the build goal is taken, this defines the command used after a successful execution of the build_cmd.
+
+    prepublish_cmd: [OPTIONAL] When the publish goal is taken, this defines the command executed before publishing artifacts defined in this file.
+
+    postpublish_cmd: [OPTIONAL] When the publish goal is taken, this defines the command executed after publishing artifacts defined in this file.
 
     artifacts: Array which defines the artifacts to deploy to an artifact store and publish.
 
@@ -145,9 +170,10 @@ Each key is described below:
 You are welcome to extend this file as you see fit.  Please prefix any additional fields you add with 'extra_' to maintain forwards compatibility.
 
 ## Usage
+
 ### Build Automation Mode
 
-In Build Automation mode, the automation runs as part of a CI action on an non-development machine.  The encrypted secrets file must be uploaded to a http(s) server accessible to the build automation.  
+In Build Automation mode, the automation runs as part of a CI action on an non-development machine.  For this to work, the encrypted secrets file must be uploaded to a http(s) server accessible to the build automation.  
 
 The tooling expects 2 environment variables to be defined:
 
@@ -205,14 +231,15 @@ In Developer mode, the build and publish process runs on a development machine. 
 Before we start, we must have:
 
   - Docker image
-  - Encrypted Secrets file
+  - Encrypted Secrets file available at secrets/secrets_mount/<mysecretsdir>-secrets.7z
   - Source code repository producing a KAB
   - Source code repository with a configured kosbuild.json file in the root directory of the repository.
 
 First, configure the kosbuild environment:
 ```
-source kosbuilder_env.source
+SECRETID=mysecretsdir source kosbuilder-with-secrets.source
 ```
+
 
 The kosbuild environment establishes 2 aliases in your shell environment.  The *kosbuild* alias starts a docker container with the docker image and performs the specified goal.  The *kosbuild_debug* alias starts a docker container witht he docker image, performs the specified goal, and then allows you to access a shell in that environment.  *kosbuild_debug* is useful for debugging build issues.
 
@@ -315,7 +342,7 @@ Assume that you have an NPM or Java repository on your developer machine that wi
       cd secrets
       ./make_secrets_file.sh <organization name>
       ```
-      After this step, a file will be placed in your secrets_mount folder called '<organization name>-secrets 7z'.  This is your encrypted 7z file.
+      After this step, a file will be placed in your secrets_mount folder called secrets_mount/'<organization name>-secrets 7z'.  This is your encrypted 7z file.
 
 5. Upload your encrypted 7z file to a location that is accessible by the Github Runners.  It should have a URL where it can be accessed.
 
@@ -391,3 +418,5 @@ jobs:
 TODO
 
 Document deployment of extra resources using kos_deploy_to_artifactstore
+
+Normalize market artifact stores and market option on artifact.  (remove from individual artifact store)

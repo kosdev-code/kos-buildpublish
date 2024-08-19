@@ -118,18 +118,14 @@ function getRemoteFilename() {
   KABVERSION=$(echo "${KABVERSION}" | sed 's/[[:space:]]*//;s/[[:space:]]*$//')
   KABTAG=$(echo "${KABTAG}" | sed 's/[[:space:]]*//;s/[[:space:]]*$//')
 
-  # if kabtag is empty, then replace with unknown
-  if [ "${KABTAG}" == "" ]; then
-  KABTAG="unknown"
-  fi
+  #replace commas and spaces in tag with underscores
+  KABTAG="${KABTAG//,/_}"
+  KABTAG="${KABTAG// /_}"
 
-  # Check if the KABTAG contains any spaces or comma characters
-  if [[ "${KABTAG}" =~ [[:space:]]|, ]] ; then
-      # not sure how to build filename if we have spaces or commas
-      echo "$0 error- tag contains spaces or commas: ${KABTAG}"
-      exit 1
+  # if kabtag is not empty, give it an underscore
+  if [ "${KABTAG}" != "" ]; then
+    KABTAG="${KABTAG}_"
   fi
-
 
   # mirror the extension of the original file, or if it has no extension, then there is no extension to extract and we'll leave it alone
   local EXTENSION
@@ -141,7 +137,7 @@ function getRemoteFilename() {
   #echo "$0: KAB Version/Tag: $KABVERSION/$KABTAG"
   #REMOTE_FILENAME="${ARTIFACTNAME}_${KABTAG}_${KABVERSION}_${KABHASH}${EXTENSION}"
   echo "$0: KAB Version: $KABVERSION"
-  REMOTE_FILENAME="${ARTIFACTNAME}_${KABVERSION}_${KABHASH}${EXTENSION}"
+  REMOTE_FILENAME="${ARTIFACTNAME}_${KAB_TAG}${KABVERSION}_${KABHASH}${EXTENSION}"
 
   echo "remote filename: ${REMOTE_FILENAME}"
 }
