@@ -50,18 +50,7 @@ WORKDIR /root
 
 COPY lib/kabtool.jar /usr/local/lib
 COPY lib/publishtool.jar /usr/local/lib
-COPY tools/publishtool /usr/local/bin
-COPY tools/kabtool     /usr/local/bin
-
-COPY tools/load_secrets.sh /usr/local/bin 
-COPY tools/kos_publish.sh /usr/local/bin
-COPY tools/kos_build.sh /usr/local/bin
-COPY tools/kos_upload_artifact /usr/local/bin
-COPY tools/kos_deploy_to_artifactstore.sh /usr/local/bin
-COPY tools/kos_artstore_upload_azure_container.sh /usr/local/bin
-COPY tools/kos_make_descriptorjson.sh /usr/local/bin
-COPY tools/kos_squash_to_kab.sh /usr/local/bin
-COPY tools/central_maven_send.sh /usr/local/bin
+COPY tools/* /usr/local/bin/
 
 COPY kos_build_handler.sh /usr/local/bin
 
