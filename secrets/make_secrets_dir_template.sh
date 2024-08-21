@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -e -o pipefail
+
 if [ $# -lt 2 ]; then
   echo "usage: $0 <orgname> <password>"
   exit 1
@@ -29,4 +31,6 @@ else
   echo "artifact store template not created- it already exists."
 fi
 
+echo "template secrets directory has been created in $(realpath ${ORGNAME})."
+echo "Fill it in with your details.  When done, you can run make_secrets_file to create an encrypted 7z suitable for deployment"
 

@@ -1,0 +1,13 @@
+This directory contains template files which can be used to enable automation on a Github repository.
+
+Copy these files to the .github/ directory of your repository and then edit them to meet your needs.
+
+The kosbuild.json file must be modified to remove the comments and customized for your build.  The workflow file
+will likely need minimal customization, if any.
+
+Once these files are committed to your repository, be sure to set the secrets on your repository.  Specifically, set:
+KOSBUILD_SECRET_URL
+and 
+KOSBUILD_SECRET_PASSWORD
+
+
