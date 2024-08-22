@@ -50,11 +50,16 @@ function handleSecrets() {
     
 }
 function copyAppToContainer() {
-   echo "kos_build_handler: copying app to the container... please wait."
-   mkdir -p ~/work
-   cp -a --no-preserve=owner /app/. ~/work
-   cd ~/work
-   echo "copying done..."
+   if [ "${KOSBUILDER_DEV}" == "1" ]; then 
+      echo "kos_build_handler: skipping copy to the container due to KOSBUILDER_DEV for user $USER"
+      cd ~/work
+   else
+      echo "kos_build_handler: copying app to the container... please wait."
+      mkdir -p ~/work
+      cp -a --no-preserve=owner /app/. ~/work
+      cd ~/work
+      echo "copying done..."
+   fi
 }
 function validate_build_definition() {
    # get the build definition, default to kosbuild.json
@@ -102,6 +107,11 @@ function handle_publish() {
    kos_publish.sh "${BUILD_DEF}"
 }
 
+function setup_path() {
+   # add $HOME/bin to the path
+   mkdir -p "$HOME/bin"
+   export PATH="$PATH:$HOME/bin"
+}
 function common_handling() {
      cd
      handleSecrets
@@ -112,6 +122,7 @@ case $1 in
   build)
      echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: build-only"
+     setup_path
      common_handling
      validate_build_definition required
      handle_build
@@ -121,6 +132,7 @@ case $1 in
   buildpublish)
      echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: build and publish"
+     setup_path
      common_handling
      validate_build_definition required
      handle_build
@@ -131,6 +143,7 @@ case $1 in
   shell)
      echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kos_build_handler: shell"
+     setup_path
      common_handling
      validate_build_definition notrequired
      bash
@@ -138,6 +151,7 @@ case $1 in
   automation)
      echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
      echo "kosbuild_handler: automation"
+     setup_path
      handleSecrets
      export
      validate_build_definition required

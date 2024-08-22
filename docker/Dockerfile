@@ -8,6 +8,9 @@ FROM node:lts as node
 ENV JAVA_HOME=/usr/lib/jvm/zulu17
 ENV PATH=$JAVA_HOME/bin:$PATH
 
+# The node Docker import includes a user node.  We don't need this and it gets in our way.  So we delete this user.
+RUN userdel -r node
+
 # Install Maven
 ARG MAVEN_VERSION=3.9.4
 ARG MAVEN_URL=https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
@@ -53,6 +56,19 @@ COPY lib/publishtool.jar /usr/local/lib
 COPY tools/* /usr/local/bin/
 
 COPY kos_build_handler.sh /usr/local/bin
+
+# If USER_NAME, USER_ID, GROUP_NAME, and GROUP_ID have been specified, then 
+# create user/group specified.  This is for a use case where we volume mount a path from the host to the 
+# container and we want permissions to match. (developer use case)
+ARG USER_NAME
+ARG USER_ID
+ARG GROUP_NAME
+ARG GROUP_ID
+RUN if [ -n "$GROUP_NAME" ] && [ -n "$GROUP_ID" ] && [ -n "$USER_ID" ] && [ -n "$USER_NAME" ]; then \
+        groupadd -g $GROUP_ID $GROUP_NAME; \
+        useradd -m -u $USER_ID -g ${GROUP_NAME:-root} $USER_NAME; \
+    fi
+
 
 # Verify installations
 RUN java -version && \

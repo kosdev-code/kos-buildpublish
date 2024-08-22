@@ -188,6 +188,11 @@ function publish_artifact_per_configfile() {
 
 ###  SHELL SCRIPT starts here:
 echo "******** PUBLISH *********"
+if [ "${KOSBUILDER_DEV}" == "1" ]; then
+  echo "Publish: KOSBUILDER_DEV is set, indicating a developer environment.  Publish is disabled for developer environments"
+  echo "set KOSBUILDER_DEV to 0 if you wish to override"
+  exit 1
+fi
 export BUILD_DEFINITION="${BUILD_DEF}"
 echo " => ${BUILD_DEFINITION}"
 
