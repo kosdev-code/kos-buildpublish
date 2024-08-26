@@ -23,7 +23,7 @@ documentation folder describing a local development machine use case (https://gi
 
 # Build Configuration File
 
-Your repository must be configured for the kOS Build and Publish process.  A build configuration file (default name: kosbuild.json) file must be placed in your repository to describe the details of the build and publish process. We recommend placing it in the .github folder, as subdirectory of the root of your repository.  An example file is shown below:
+Your repository must be configured for the kOS Build and Publish process.  A build configuration file (default name: kosbuild.json) file must be placed in your repository to describe the details of the build and publish process. We recommend placing it in the .github folder subdirectory off the root of your repository.  An example file is shown below:
 
 ```
 {
@@ -47,7 +47,7 @@ Each key is described below:
 
     default_keyset: Defines the keyset that will be used by kabtool when generating KAB files.  The default_keyset value drives the contents of the ~/kosStudio/tools.properties file to set the keyset.
 
-    onload_cmd: [OPTIONAL] When executing the kos_build_handler, after the secrets have been loaded, this onload_cmd is run automatically.  You may use this to initialize your environment or add additional set-up should you need to do so.
+    onload_cmd: [OPTIONAL] When executing the kos_build_handler, after the secrets have been loaded, this onload_cmd is run automatically.  You may use this to initialize your environment or add additional set-up if necessary.
 
     prebuild_cmd: [OPTIONAL]  When the build goal is taken, this is called before the *build_cmd*.  No action is taken if this is not set.
 

@@ -1,8 +1,8 @@
 # Local Development Machine Use Case
 
-This document describes how to use the build/publish tooling on your local machine.  For building artifacts in a production environment, we recommend the automation use case.  However, this mode is useful when building locally or when additional debug is needed.
+This document describes how to use the build/publish tooling on your local machine.  This is useful for setting up the build/publish tooling for the first time for your repository, and also allows for additional debug.
 
-WORK-IN-PROGRESS
+We offer 2 local development paths - In the "developer" use case, your working directory will be mounted into the docker container. In the "automation" use case, your working directory is copied into the docker container and any changes made in the docker image are not persisted on your system.  The "automation" use case assumes that you are building and publishing from the docker container and that there is no need to keep files around after publishing.
 
 # Requirements
 
@@ -16,15 +16,17 @@ WORK-IN-PROGRESS
 
 # Docker Image
 
-This build process uses a Docker image for a reproducible build environment.  Prior to using this tool, you must have the Docker image on your machine.  To build the Docker image, run the setup_kosbuilder.sh script from this repository.  A docker image is publicly available which can be used.  See https://github.com/kosdev-code/kos-buildpublish/pkgs/container/kos-buildpublish%2Fkos_builder
+This build process uses a Docker image for a reproducible build environment.  Prior to using this tool, you must have the Docker image on your machine.
 
-# Build Configuration File
+The docker image for the local "developer" use case can be built by running the "build_docker_for_developer" script in the docker folder.
 
-The same build configuration file from the automation use case applies to the developer use case.  However, it is expected that you might not publish artifacts in the developer use case.
+The docker image for the local "automation" use case can be built by running the "build_docker" script in the docker folder.  Additionally, a docker image is publicly available which can be used.  See https://github.com/kosdev-code/kos-buildpublish/pkgs/container/kos-buildpublish%2Fkos_builder
 
-# Developer Mode
 
-In Developer mode, the build and publish process runs on a development machine.  This mode is useful for proving the build and publish process locally prior to deploying to automation.
+# Usage
+
+Both the local "developer" use case and local "automation" use case work similarly.  The difference between them is that the local "developer" use case mounts your working folder to $HOME/work, and any files that are modified, created, or deleted in $HOME/work are persisted on your host machine.  The local "automation" use case simply copies all files from your local tree to the docker container.  No files are ever modified on your local host machine.
+
 
 Before we start, we must have:
 
@@ -34,14 +36,21 @@ Before we start, we must have:
   - Source code repository with a configured kosbuild.json file in the root directory of the repository.
 
 First, configure the kosbuild environment:
+
+[Local automation environment]
 ```
-SECRETID=mysecretsdir source kosbuilder-with-secrets.source
+SECRETID=mysecretsdir source kosbuilder.env.source
+```
+[Local developer environment]
+```
+SECRETID=mysecretsdir source kosbuilder-developer.env.source
 ```
 
+The kosbuild environment establishes 2 aliases in your shell environment.  The *kosbuild* alias starts a docker container with the docker image and performs the specified goal.  The *kosbuild_debug* alias starts a docker container witht he docker image, performs the specified goal, and then when done, a shell is run in that environment for you to examine the output.  We expect that *kosbuild_debug* could be useful for resolving some build issues.
 
-The kosbuild environment establishes 2 aliases in your shell environment.  The *kosbuild* alias starts a docker container with the docker image and performs the specified goal.  The *kosbuild_debug* alias starts a docker container witht he docker image, performs the specified goal, and then allows you to access a shell in that environment.  *kosbuild_debug* is useful for debugging build issues.
+There are several arguments you can use to the kosbuild (or kos_build_debug) alias: build, buildpublish, and shell.
 
-Now, enter the repository you wish to build (which contains the build configuration file) file.  If the build configuration is not specified, the tooling defaults to kosbuild.json.
+Enter a directory containing repository you wish to build.  The second argument required is the build configuration.  If the build configuration is not specified, the tooling defaults to kosbuild.json.
 
 To perform a build and exit, simply run:
 `kosbuild build [build configuration file]`
@@ -52,6 +61,3 @@ To perform a build and publish, simply run:
 To use the docker image as an environment:
 `kosbuild shell [build configuration file]`
 
-In the above cases, kosbuild_debug may also be used- when the goal is done, a shell will remain open for further analysis.
-
-**Important!** The build and publish process in the container is ephemeral. Any files created inside of the environment are removed when the docker container exits.  Files are not modified on your host system when performing the build.
