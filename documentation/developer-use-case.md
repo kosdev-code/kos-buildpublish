@@ -22,6 +22,9 @@ The docker image for the local "developer" use case can be built by running the 
 
 The docker image for the local "automation" use case can be built by running the "build_docker" script in the docker folder.  Additionally, a docker image is publicly available which can be used.  See https://github.com/kosdev-code/kos-buildpublish/pkgs/container/kos-buildpublish%2Fkos_builder
 
+# Secrets file for Developer Use Case
+
+A script in the secrets/ folder is available, `make_secrets_developer.sh`, which will take your home directory, and will extract the npmrc, maven settings, and default keyset, creating a developer secrets folder.  This developer secrets folder then will be used by default when using the Local developer environment.  The secrets folder for the developer use case may be further customized for your needs.
 
 # Usage
 
@@ -43,6 +46,8 @@ SECRETID=mysecretsdir source kosbuilder.env.source
 ```
 [Local developer environment]
 ```
+# SECRETID is optional - if unspecified and a developer secrets file has been created, it will be used.
+
 SECRETID=mysecretsdir source kosbuilder-developer.env.source
 ```
 
