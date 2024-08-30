@@ -78,7 +78,16 @@ function validate_build_definition() {
       if [ "${default_keyset}" != "null" ]; then
          # setup the default keyset such that studio tools work with it
          local KEYSET_PATH="$HOME/.kosbuild/keysets/${default_keyset}.keyset"
-         [ ! -f "${KEYSET_PATH}" ] && echo "keyset not found in ${KEYSET_PATH}" && exit 1
+         if [ ! -f "${KEYSET_PATH}" ]; then
+            DEVELOPER_KEYSET_PATH="$HOME/.kosbuild/keysets/developer.keyset"
+            if [ ! -f "${DEVELOPER_KEYSET_PATH}" ]; then
+               echo "ERROR: specified keyset ${default_keyset} not found."
+               exit 1
+            fi
+            
+            echo "WARNING: ${default_keyset} keyset not found.  Using developer keyset instead."
+            KEYSET_PATH="${DEVELOPER_KEYSET_PATH}"
+         fi
          mkdir -p "$HOME/kosStudio"
          echo "keyset = ${KEYSET_PATH}" > "${HOME}/kosStudio/tools.properties"
          if [ "${GITHUB_ACTIONS}" == "true" ]; then

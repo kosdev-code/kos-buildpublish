@@ -36,6 +36,7 @@ echo "extracting secrets..."
 
 
 echo "installing secrets..."
+mkdir -p $HOME/.kosbuild
 # Install the secrets to the proper location
 ## npmrc
 if [ -f "${EXTRACT_DIR}/${NPMRC_FILE}" ]; then
@@ -55,19 +56,16 @@ fi
 
 ## keysets folder
 if [ -d "${EXTRACT_DIR}/${KEYSETS_DIR}" ]; then
-    mkdir -p $HOME/.kosbuild
     mv "${EXTRACT_DIR}/${KEYSETS_DIR}" $HOME/.kosbuild
 fi
 
 ## artifactstores folder
 if [ -d "${EXTRACT_DIR}/${ARTIFACTSTORES}" ]; then
-    mkdir -p $HOME/.kosbuild
     mv "${EXTRACT_DIR}/${ARTIFACTSTORES}" $HOME/.kosbuild
 fi
 
 ## artifactstores folder
 if [ -d "${EXTRACT_DIR}/${USERSECRETS}" ]; then
-    mkdir -p $HOME/.kosbuild
     mv "${EXTRACT_DIR}/${USERSECRETS}" $HOME/.kosbuild
 fi
 
