@@ -14,30 +14,4 @@ KABFILE="$2"
 VERSION="$3"
 DESCRIPTOR="$4"
 
-# make a temporary directory
-TMPDIR="$(mktemp -d)"
-# the squash becomes layer.img
-cp "${SQUASHFILE}" "${TMPDIR}/layer.img"
-
-# include the descriptor if it exists
-if [ ! -z "${DESCRIPTOR}" ]; then
-  cp "${DESCRIPTOR}" "${TMPDIR}/descriptor.json"
-fi
-
-# now, create the KAB
-pushd "${TMPDIR}"
-zip -Z store tmp.zip layer.img
-# add descriptor if we have it.
-[ ! -z "${DESCRIPTOR}" ] && zip -Z store tmp.zip descriptor.json
-
-if [ "${KAB_TAG}" != "" ]; then
-  kabtool -b -t kos.layer -v "${VERSION}" -q "${KAB_TAG}" -z tmp.zip layer.kab
-else
-  kabtool -b -t kos.layer -v "${VERSION}" -z tmp.zip layer.kab
-fi
-popd
-
-# put the KAB where it needs to go and remove temporary files
-cp "${TMPDIR}/layer.kab" "${KABFILE}"
-rm -rf "${TMPDIR}"
-
+kos_make_layer_kab.sh "${SQUASHFILE}" "${KABFILE}" "${VERSION}" "kos.layer" ${DESCRIPTOR}
