@@ -8,7 +8,7 @@ set -e -o pipefail
 echo "install kos_buildpublish for non-docker use case"
 echo "  this script assumes that you already have the dependencies needed on your system"
 
-LOCALBIN="$HOME/.local/bin"
+LOCALBIN="$HOME/.kosbuild/bin"
 mkdir -p "${LOCALBIN}"
 
 
