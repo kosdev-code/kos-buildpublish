@@ -39,12 +39,13 @@ ARG AZCOPY_VERSION=10.25.1
 # Download and install azcopy for the correct architecture
 RUN case $(uname -m) in \
     x86_64) \
-        curl -L https://azcopyvnext.azureedge.net/releases/release-10.25.1-20240612/azcopy_linux_amd64_10.25.1.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_amd64_$AZCOPY_VERSION/azcopy; \
+        curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_amd64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_amd64_$AZCOPY_VERSION/azcopy; \
         ;; \
     aarch64) \
-        curl -L https://azcopyvnext.azureedge.net/releases/release-10.25.1-20240612/azcopy_linux_arm64_10.25.1.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_arm64_$AZCOPY_VERSION/azcopy; \
+        curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_arm64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_arm64_$AZCOPY_VERSION/azcopy; \
         ;; \
     esac
+
 
 # Copy Java from the first stage to the new stage
 COPY --from=java $JAVA_HOME $JAVA_HOME
