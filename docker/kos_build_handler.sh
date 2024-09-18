@@ -50,6 +50,9 @@ function handleSecrets() {
     
 }
 function copyAppToContainer() {
+   if [ "${KOSBUILDER_NO_CONTAINER}" == "1" ]; then
+      return
+   fi
    if [ "${KOSBUILDER_DEV}" == "1" ]; then 
       echo "kos_build_handler: skipping copy to the container due to KOSBUILDER_DEV for user $USER"
       cd ~/work
