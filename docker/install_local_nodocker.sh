@@ -31,6 +31,6 @@ case $(uname -m) in \
 esac
 
 # get the kos tools
-./kos_gettools
-cp "${THIS_SCRIPT_DIR}/kabtool.jar" "${THIS_SCRIPT_DIR}/publishtool.jar" "${LOCALBIN}"
+"${THIS_SCRIPT_DIR}/kos_gettools"
+cp "${THIS_SCRIPT_DIR}/lib/kabtool.jar" "${THIS_SCRIPT_DIR}/lib/publishtool.jar" "${LOCALBIN}"
 
