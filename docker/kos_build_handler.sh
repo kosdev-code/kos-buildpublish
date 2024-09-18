@@ -47,7 +47,6 @@ function handleSecrets() {
     fi
     # remove KOSBUILD_SECRET_PASSWORD export
     export -n KOSBUILD_SECRET_PASSWORD
-    
 }
 function copyAppToContainer() {
    if [ "${KOSBUILDER_NO_CONTAINER}" == "1" ]; then
@@ -139,7 +138,9 @@ case $1 in
      validate_build_definition required
      handle_build
      # debug only
-     [ "${KOSDEBUG}" == "1" ] && bash
+     if [ "${KOSDEBUG}" == "1" ]; then
+        bash
+     fi
      ;;
   buildpublish)
      echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
@@ -150,7 +151,9 @@ case $1 in
      handle_build
      handle_publish
      # debug only
-     [ "${KOSDEBUG}" == "1" ] && bash
+     if [ "${KOSDEBUG}" == "1" ]; then
+        bash
+     fi
      ;;
   shell)
      echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
