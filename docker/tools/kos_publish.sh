@@ -158,6 +158,7 @@ function publish_artifact_per_configfile() {
     art_artstore=$(jq -r ".artifacts[$i].artifactstore" "${CFGFILE}")
     art_qualifier=$(jq -r ".artifacts[$i].qualifier" "${CFGFILE}")
     art_marketplace=$(jq -r ".artifacts[$i].marketplace" "${CFGFILE}")
+    REMOTE_FILENAME="$(jq -r ".artifacts[$i].remote_filename" "${CFGFILE}")"
 
     # if qualifier is unset, it's any
     if [[ "${art_qualifier}" == "null" ]]; then
@@ -166,6 +167,10 @@ function publish_artifact_per_configfile() {
     # if marketplace is unset, it's any
     if [[ "${art_marketplace}" == "null" ]]; then
     art_marketplace=0
+    fi
+    # remote_filename is optional, so if it's not set, then blank it out
+    if [[ "${REMOTE_FILENAME}" == "null" ]]; then
+      REMOTE_FILENAME=""
     fi
 
 
@@ -176,7 +181,7 @@ function publish_artifact_per_configfile() {
     get_filename "${art_filename}"
 
     # determine the remote filename, populating REMOTE_FILENAME
-    getRemoteFilename "${art_id}" "${FILE_TO_PUBLISH}"
+    [ "${REMOTE_FILENAME}" == "" ] && getRemoteFilename "${art_id}" "${FILE_TO_PUBLISH}"
 
     # upload the artifact to the repo
     kos_upload_artifact "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
