@@ -29,7 +29,7 @@ Your repository must be configured for the kOS Build and Publish process.  A bui
 {
   "default_keyset": "test.demo",
   "prebuild_cmd": "./prebuild.sh"
-  "build_cmd": "./quickbuild.sh",
+  "build_cmd": "./quickbuild.sh",  
 
   "artifacts": [
     {
@@ -58,6 +58,8 @@ Each key is described below:
     prepublish_cmd: [OPTIONAL] When the publish goal is taken, this defines the command executed before publishing artifacts defined in this file.
 
     postpublish_cmd: [OPTIONAL] When the publish goal is taken, this defines the command executed after publishing artifacts defined in this file.
+
+    artifact_fail_policy: [OPTIONAL, default: hard] When set to soft, the build automation will continue if the artifact file does not exist.  If set to hard, the automation will fail if the artifact to be published does not exist.
 
     artifacts: Array which defines the artifacts to deploy to an artifact store and publish.
 
