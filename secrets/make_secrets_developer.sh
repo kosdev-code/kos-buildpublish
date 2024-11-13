@@ -35,7 +35,7 @@ if [ ! -f "${TGTDIR}/secrets_password" ]; then
 fi
 
 echo "create secrets file"
-${THIS_SCRIPT_DIR}/make_secrets_file.sh developer
+${THIS_SCRIPT_DIR}/make_secrets_file.sh "${TGTDIR}"
 
 echo "You can customize the developer directory for your needs (${TGTDIR})."
 echo "When done, simply create the secrets file again."
