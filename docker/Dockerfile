@@ -40,9 +40,13 @@ ARG AZCOPY_VERSION=10.25.1
 RUN case $(uname -m) in \
     x86_64) \
         curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_amd64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_amd64_$AZCOPY_VERSION/azcopy; \
+	chmod +x /usr/local/bin/azcopy; \
+        chown 0:0 /usr/local/bin/azcopy; \
         ;; \
     aarch64) \
         curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_arm64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_arm64_$AZCOPY_VERSION/azcopy; \
+	chmod +x /usr/local/bin/azcopy; \
+        chown 0:0 /usr/local/bin/azcopy; \
         ;; \
     esac
 
