@@ -18,9 +18,9 @@ cp "${HOME}/.m2/settings.xml" "${TGTDIR}/settings.xml"
 fi
 
 if [ -f "${HOME}/kosStudio/tools.properties" ]; then
-keyset_value=$(grep -oP '(?<=keyset = ).*' "${HOME}/kosStudio/tools.properties")
+  keyset_value=$(perl -nle 'print $1 if /keyset = (.*)/' "${HOME}/kosStudio/tools.properties")
   if [ -f "${keyset_value}" ]; then 
-    echo "installing developer keyset"
+    echo "installing developer keyset ${keyset_value}"
 
     mkdir -p "${TGTDIR}/keysets"
     cp "${keyset_value}" "${TGTDIR}/keysets/developer.keyset"
