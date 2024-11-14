@@ -11,9 +11,9 @@ cd "${THIS_SCRIPT_DIR}"
 
 # get the GROUPNAME, GID to pass to docker build
 #UID="$(id -u)"
-GROUPNAME="$(id -g -n $USER)"
+GROUPNAME="$(id -g -n "$USER")"
 GID="$(id -g)"
 
 DOCKER_IMAGE_NAME="kosbuilder-developer"
 # build the docker image, with name kosbuilder-dev
-docker build --build-arg USER_NAME=$USER --build-arg USER_ID=$UID --build-arg GROUP_NAME=$GROUPNAME --build-arg GROUP_ID=$GID -t "${DOCKER_IMAGE_NAME}" .
+docker build --build-arg "USER_NAME=$USER" --build-arg USER_ID=$UID --build-arg "GROUP_NAME=$GROUPNAME" --build-arg GROUP_ID=$GID -t "${DOCKER_IMAGE_NAME}" .

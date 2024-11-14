@@ -19,9 +19,9 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 SECRETS_DIR="$1"
-OUTPUT_FILE="$(pwd)/secrets_mount/$(basename ${SECRETS_DIR})-secrets.7z"
+OUTPUT_FILE="${THIS_SCRIPT_DIR}/secrets_mount/$(basename "${SECRETS_DIR}")-secrets.7z"
 if [ $# -gt 1 ]; then
-OUTPUT_FILE="$(realpath $2)"
+OUTPUT_FILE="$(realpath "$2")"
 fi
 
 # confirm that the secrets directory is actually a directory.
@@ -79,7 +79,7 @@ fi
 # capture the password argument
 SECRET_PASSWORD_FILE="${SECRETS_DIR}/secrets_password"
 if [ -f "${SECRET_PASSWORD_FILE}" ]; then
-    KOSBUILD_SECRET_PASSWORD=$(cat ${SECRET_PASSWORD_FILE})
+    KOSBUILD_SECRET_PASSWORD=$(cat "${SECRET_PASSWORD_FILE}")
     echo "using password from file ${SECRET_PASSWORD_FILE}"
 fi
 if [ "${KOSBUILD_SECRET_PASSWORD}" != "" ]; then
@@ -94,7 +94,7 @@ fi
 mkdir -p "$(dirname "${OUTPUT_FILE}")"
 rm -f "${OUTPUT_FILE}"
 pushd "${SECRETS_DIR}"
-7z a -t7z -mhe ${SECRET_ARG_7Z} "${OUTPUT_FILE}" ${ALLFILES}
+7z a -t7z -mhe "${SECRET_ARG_7Z}" "${OUTPUT_FILE}" ${ALLFILES}
 popd
 
 # replace the secrets.7z file

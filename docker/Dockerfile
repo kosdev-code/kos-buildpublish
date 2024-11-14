@@ -70,8 +70,8 @@ ARG USER_ID
 ARG GROUP_NAME
 ARG GROUP_ID
 RUN if [ -n "$GROUP_NAME" ] && [ -n "$GROUP_ID" ] && [ -n "$USER_ID" ] && [ -n "$USER_NAME" ]; then \
-        groupadd -g $GROUP_ID $GROUP_NAME; \
-        useradd -m -u $USER_ID -g ${GROUP_NAME:-root} $USER_NAME; \
+        groupadd -g $GROUP_ID "$GROUP_NAME"; \
+        useradd -m -u $USER_ID -g "${GROUP_NAME:-root}" "$USER_NAME"; \
     fi
 
 
