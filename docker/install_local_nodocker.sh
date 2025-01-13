@@ -3,7 +3,7 @@
 THIS_SCRIPT=$(realpath "$0")
 THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
 
-set -e -o pipefail
+set -e
 
 echo "install kos_buildpublish for non-docker use case"
 echo "  this script assumes that you already have the dependencies needed on your system"
@@ -19,16 +19,26 @@ chmod +x "${LOCALBIN}/load_secrets.sh" "${LOCALBIN}/kos_"* "${LOCALBIN}/kabtool"
 sed -i 's|/usr/local/lib|'"${LOCALBIN}"'|g' "${LOCALBIN}/kabtool"
 sed -i 's|/usr/local/lib|'"${LOCALBIN}"'|g' "${LOCALBIN}/publishtool"
 
+AZCOPY_URL=""
 # need to install azcopy
-AZCOPY_VERSION=10.25.1
 case $(uname -m) in \
     x86_64) \
-        curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_amd64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C "$LOCALBIN" azcopy_linux_amd64_$AZCOPY_VERSION/azcopy; \
+	AZCOPY_URL=https://aka.ms/downloadazcopy-v10-linux
         ;; \
     aarch64) \
-        curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_arm64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C "$LOCALBIN" azcopy_linux_arm64_$AZCOPY_VERSION/azcopy; \
+	AZCOPY_URL=https://aka.ms/downloadazcopy-v10-linux-arm64
         ;; \
 esac
+if [ -z "${AZCOPY_URL}" ]; then
+  echo "error: no azcopy url"
+  exit 1
+fi
+
+TMP_AZCOPY_TARBALL=azcopy_tmp.tar.gz
+curl -f -L -o "${TMP_AZCOPY_TARBALL}" "${AZCOPY_URL}"
+extracted_dir=$(tar -tf ${TMP_AZCOPY_TARBALL} | head -1 | cut -d/ -f1)
+tar xzf "${TMP_AZCOPY_TARBALL}" --strip-components=1 --directory "$LOCALBIN" "${extracted_dir}/azcopy"
+rm "${TMP_AZCOPY_TARBALL}"
 
 # get the kos tools
 "${THIS_SCRIPT_DIR}/kos_gettools"
