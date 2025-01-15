@@ -33,23 +33,10 @@ RUN apt-get update && \
     apt-get install -y golang nsis && \
     rm -rf /var/lib/apt/lists/*
 
-# Define the version of azcopy to download
-ARG AZCOPY_VERSION=10.25.1
-
-# Download and install azcopy for the correct architecture
-RUN case $(uname -m) in \
-    x86_64) \
-        curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_amd64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_amd64_$AZCOPY_VERSION/azcopy; \
-	chmod +x /usr/local/bin/azcopy; \
-        chown 0:0 /usr/local/bin/azcopy; \
-        ;; \
-    aarch64) \
-        curl -L https://azcopyvnext.azureedge.net/releases/release-${AZCOPY_VERSION}-20240612/azcopy_linux_arm64_${AZCOPY_VERSION}.tar.gz | tar -xvz --strip-components=1 -C /usr/local/bin azcopy_linux_arm64_$AZCOPY_VERSION/azcopy; \
-	chmod +x /usr/local/bin/azcopy; \
-        chown 0:0 /usr/local/bin/azcopy; \
-        ;; \
-    esac
-
+# azcopy is downloaded with the kos_gettools step
+COPY "download/azcopy/current/azcopy" /usr/local/bin
+RUN chmod +x /usr/local/bin/azcopy; \
+    chown 0:0 /usr/local/bin/azcopy
 
 # Copy Java from the first stage to the new stage
 COPY --from=java $JAVA_HOME $JAVA_HOME

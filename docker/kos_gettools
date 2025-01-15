@@ -13,4 +13,37 @@ if [ ! -f kos-buildtools-java.tgz ]; then
 else
   echo "kos-buildtools-java.tgz already downloaded"
 fi
+
+AZCOPY_URL=""
+# need to install azcopy
+case $(uname -m) in \
+    x86_64) \
+	AZCOPY_URL=https://aka.ms/downloadazcopy-v10-linux
+        ;; \
+    aarch64) \
+	AZCOPY_URL=https://aka.ms/downloadazcopy-v10-linux-arm64
+        ;; \
+esac
+if [ -z "${AZCOPY_URL}" ]; then
+  echo "error: no azcopy url"
+  exit 1
+fi
+
+LOCALBIN="${THIS_SCRIPT_DIR}/download/azcopy/$(uname -m)"
+if [ ! -f "${LOCALBIN}/azcopy" ]; then
+  mkdir -p "${LOCALBIN}"
+  TMP_AZCOPY_TARBALL=azcopy_tmp.tar.gz
+  curl -f -L -o "${TMP_AZCOPY_TARBALL}" "${AZCOPY_URL}"
+  extracted_dir=$(tar -tf ${TMP_AZCOPY_TARBALL} | head -1 | cut -d/ -f1)
+  tar xzf "${TMP_AZCOPY_TARBALL}" --strip-components=1 --directory "$LOCALBIN" "${extracted_dir}/azcopy"
+  rm "${TMP_AZCOPY_TARBALL}"
+else
+  echo "azcopy already downloaded..."
+fi
+
+# put azcopy in a current directory so it's easy for the Dockerfile to place it.
+mkdir -p "${LOCALBIN}/../current"
+cp "${LOCALBIN}/azcopy" "${LOCALBIN}/../current"
+
 popd
+
