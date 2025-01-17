@@ -23,6 +23,9 @@ case $(uname -m) in \
     aarch64) \
 	AZCOPY_URL=https://aka.ms/downloadazcopy-v10-linux-arm64
         ;; \
+    arm64) \
+	AZCOPY_URL=https://aka.ms/downloadazcopy-v10-linux-arm64
+        ;; \
 esac
 if [ -z "${AZCOPY_URL}" ]; then
   echo "error: no azcopy url"
