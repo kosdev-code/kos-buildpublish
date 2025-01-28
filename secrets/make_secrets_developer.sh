@@ -27,6 +27,13 @@ if [ -f "${HOME}/kosStudio/tools.properties" ]; then
   fi
 fi
 
+if [ -d "${HOME}/.ssh" ]; then
+  echo "copying ssh private keys to secrets"
+  mkdir -p "${TGTDIR}/usersecrets/ssh-private"
+  cp -r ${HOME}/.ssh/* "${TGTDIR}/usersecrets/ssh-private"
+  cp "${THIS_SCRIPT_DIR}/developer_secrets_init" "${TGTDIR}/usersecrets/secrets_init"
+fi
+
 if [ ! -f "${TGTDIR}/secrets_password" ]; then
   set +e
   echo "write random password"
