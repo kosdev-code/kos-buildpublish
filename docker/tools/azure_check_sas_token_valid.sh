@@ -55,8 +55,8 @@ TOKENNAME="$2"
 
 echo "checking SAS token ${TOKENNAME}..."
 STATUS="$(check_sas_token_expiration "${TOKEN}")"
-echo "SAS token ${TOKENNAME} is ${STATUS}"
 if [ "${STATUS}" == "invalid" ]; then
+echo "ERROR: SAS token ${TOKENNAME} is expired"
 exit 1
 fi
 exit 0
