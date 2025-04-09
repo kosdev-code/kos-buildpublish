@@ -17,10 +17,17 @@ As part of the build and publish process, you must configure a folder containing
    usersecrets/        [Optional Directory containing secrets or files that you wish to use during the build process]
    npmrc               [Optional, npmrc file]
    settings.xml        [Optional, maven settings file]
-   secrets_password    [Text file containing the password to the Secrets file]
 ```
 
-This folder is then transformed into an encrypted 7z file with the provided script `make_secrets_file.sh` for use by the build process.  The secrets_password file is not included in the encrypted 7z file, but is used by tooling to create the secrets file and to run the build process locally.
+This folder is then transformed into an encrypted 7z file with the provided script `make_secrets_file.sh` for use by the build process.  
+
+A corresponding secret-detail JSON file is also required, and consists of the following schema:
+```
+{
+  "url": "<insert url here>",
+  "password": "<insert strong password for encrypted password here>"
+}
+```
 
 Details on the secrets directory follows:
 
@@ -71,14 +78,13 @@ Every build process is different.  If you have additional secrets that do not fi
 
 # Secrets file creation
 
-A template secrets directory can be created by running the `make_secrets_dir_template.sh` script (found in the `secrets` folder of this repo). This will create the layout of the secrets directory that you can customize for your use.
+A template secrets directory can be created by running the `make_secrets_dir_template.sh` script (found in the `secrets` folder of this repo). This will create the layout of the secrets directory that you can customize for your use.  Additionally, it will create the secrets-detail JSON file; you should check this file when done to make sure the data is accurate.
 
-Once you have customized your secrets directory, use the `make_secrets_file.sh` script to create an encrypted 7z file with your secrets.  The script takes the path to the secrets folder that you have created and an optional output filename.
+Once you have customized your secrets directory, use the `make_secrets_file.sh` script to create an encrypted 7z file with your secrets.  The script takes the orgname of the secrets, and it will write to a fixed filename.
 
 ```
 usage: ./make_secrets_file.sh <secrets directory> [secrets-output file]
 ```
 
-You must have either have a file in the secrets folder called, "secrets_password" or an environment variable, KOSBUILD_SECRETS_PASSWORD, defined when running the make_secrets_file.sh.  This password is applied to the 7z file and is required for decryption.
-
-If you do not specify a "secrets-output file", it will output the secrets to the secrets_mount folder.  Your secrets file can then easily be used for local builds with the provided scripts.
+The secrets-detail file, found at secrets/secret-detail/secrets-<org>.json is the source of the password
+for the encrypted secrets file.  You must keep this file secure.

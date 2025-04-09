@@ -4,7 +4,10 @@ THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
 
 set -e -o pipefail
 
-TGTDIR="${THIS_SCRIPT_DIR}/developer"
+source "${THIS_SCRIPT_DIR}/sm_funcs.source"
+SECRETID=developer
+
+TGTDIR="${SECRET_WORKTOP_DIR}/$SECRETID"
 mkdir -p "${TGTDIR}"
 
 if [ -f "${HOME}/.npmrc" ]; then
@@ -23,7 +26,7 @@ if [ -f "${HOME}/kosStudio/tools.properties" ]; then
     echo "installing developer keyset ${keyset_value}"
 
     mkdir -p "${TGTDIR}/keysets"
-    cp "${keyset_value}" "${TGTDIR}/keysets/developer.keyset"
+    cp "${keyset_value}" "${TGTDIR}/keysets/${SECRETID}.keyset"
   fi
 fi
 
@@ -34,17 +37,15 @@ if [ -d "${HOME}/.ssh" ]; then
   cp "${THIS_SCRIPT_DIR}/developer_secrets_init" "${TGTDIR}/usersecrets/secrets_init"
 fi
 
-if [ ! -f "${TGTDIR}/secrets_password" ]; then
-  set +e
-  echo "write random password"
-  < /dev/urandom tr -dc 'A-Za-z0-9' | head -c 20 > "${TGTDIR}/secrets_password"
-  set -e
-fi
+# set the encrypted 7z password - fixed password for the developer org
+SECRET_DETAIL_FILENAME="$(getSecretDetailFilename "$SECRETID")"
+PASSWORD=developer
+echo '{ "url": "", "password": "'${PASSWORD}'"}' | jq > "${SECRET_DETAIL_FILENAME}"
 
 echo "create secrets file"
-"${THIS_SCRIPT_DIR}/make_secrets_file.sh" "${TGTDIR}"
+"${THIS_SCRIPT_DIR}/make_secrets_file.sh" "${SECRETID}"
 
-echo "You can customize the developer directory for your needs (${TGTDIR})."
+echo "You can customize the $SECRETID directory for your needs (${TGTDIR})."
 echo "When done, simply create the secrets file again."
 
 

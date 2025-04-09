@@ -4,6 +4,8 @@ THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
 
 set -e -o pipefail
 
+source "${THIS_SCRIPT_DIR}/sm_funcs.source"
+
 stoponerror=1
 
 error() {
@@ -62,7 +64,7 @@ function check_artifactstore_dir () {
     for repo in "${asdir}/"*.json; do
        if [ -f "${repo}" ]; then
            sastoken="$(jq -r .sastoken ${repo})"
-           if [ $? -ne 0 ]; then
+           if [ "$sastoken" == "null" ]; then
               continue
            fi
 
@@ -116,13 +118,15 @@ function check_secrets_dir () {
 
     secretsdir="$1"
     artifactstoredir="${secretsdir}/artifactstores"
+
+    echo "[${secretsdir}]"
     if [ -d "${artifactstoredir}" ]; then
        check_artifactstore_dir "${artifactstoredir}" || error "invalid artifact store ${artifactstoredir}"
        check_json_files "${artifactstoredir}" || error "invalid json files found in ${artifactstoredir}"
     fi
 }
 
-declare -a EXCLUDED_DIRS="(secrets_mount developer)"
+declare -a EXCLUDED_DIRS="(developer)"
 function isExcluded() {
     local dir="$1"
     for excluded_dir in "${EXCLUDED_DIRS[@]}"; do
@@ -134,11 +138,12 @@ function isExcluded() {
 }
 
 
+cd "$SECRET_WORKTOP_DIR"
 for dir in *; do
   if [ -d "${dir}" ]; then
     # Check if the directory is excluded
     if ! isExcluded "$dir"; then
-      check_secrets_dir "${THIS_SCRIPT_DIR}/${dir}"
+      check_secrets_dir "${dir}"
     fi
   fi
 done

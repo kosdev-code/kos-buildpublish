@@ -34,7 +34,7 @@ Both the local "developer" use case and local "automation" use case work similar
 Before we start, we must have:
 
   - Docker image
-  - Encrypted Secrets file available at secrets/secrets_mount/<mysecretsdir>-secrets.7z
+  - Encrypted Secrets file available at secrets/work/<orgname>-secrets.7z
   - Source code repository producing a KAB
   - Source code repository with a configured kosbuild.json file in the root directory of the repository.
 
@@ -55,7 +55,7 @@ The kosbuild environment establishes 2 aliases in your shell environment.  The *
 
 There are several arguments you can use to the kosbuild (or kos_build_debug) alias: build, buildpublish, and shell.
 
-Enter a directory containing repository you wish to build.  The second argument required is the build configuration.  If the build configuration is not specified, the tooling defaults to kosbuild.json.
+Enter a directory containing repository you wish to build.  The second argument is the build configuration.  If the build configuration is not specified, the tooling defaults to kosbuild.json.
 
 To perform a build and exit, simply run:
 `kosbuild build [build configuration file]`
