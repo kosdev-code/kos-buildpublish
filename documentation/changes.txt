@@ -1,0 +1,8 @@
+Changes
+-------
+
+2025-April-14 : Removed the artifacts.marketplace option from build configuration.  Whether an artifact is published 
+                to the market is driven by the artifactstore, not the artifact itself. In other words, the artifact
+                store defines whether it holds marketplace artifacts.  If an artifact is published to an artifactstore
+                which holds market artifacts, then the artifact is a market artifact.
+

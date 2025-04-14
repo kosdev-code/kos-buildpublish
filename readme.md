@@ -36,8 +36,7 @@ Your repository must be configured for the kOS Build and Publish process.  A bui
       "id": "demo-kos-app",
       "filename": "target/demo-kos-app-${KOS_STD_VERSION_REGEX}.kab",
       "artifactstore": "kosDemos",
-      "qualifier": "any",
-      "marketplace": 0
+      "qualifier": "any"
     }
   ]
 }
@@ -70,8 +69,6 @@ Each key is described below:
     artifacts.artifactstore: name of the artifact store to publish to.  A file in the secrets file, `<artifactstore name>.json` must exist linking your artifact to the artifactstore.
 
     artifacts.qualifier: [OPTIONAL]- qualifier used for publishing.  This defaults to "any" if not specified.
-    
-    artifacts.marketplace: [OPTIONAL]- set to 1 for marketplace artifacts.  Defaults to 0.
 
 You are welcome to extend this file as you see fit.  Please prefix any additional fields you add with 'extra_' to maintain forwards compatibility.
 
@@ -295,4 +292,3 @@ TODO
 
 Document deployment of extra resources using kos_deploy_to_artifactstore
 
-Normalize market artifact stores and market option on artifact.  (remove from individual artifact store)
