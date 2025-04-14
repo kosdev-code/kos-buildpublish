@@ -38,7 +38,7 @@ For the artifact store, configure a file, `artifactstores/acmeRepo.json` as foll
     "studio-apikey": "INSERT APIKEY FROM STUDIO HERE",
     "container": "https://STORAGEACCOUNTNAME.blob.core.windows.net/artifacts-acme  # REPLACE Storage account and Container",
     "sastoken": "sp=racwl&st=2024-12-23T17:11:03Z&se=2025-05-11T00:11:03Z&spr=https&CENSORED # REPLACE WITH SAS TOKEN from Azure Storage Account which has access to this container",
-    "marketplace": 1
+    "marketplace": true
 }
 ```
 (Be sure to remove the comments and fill in your details for each value)

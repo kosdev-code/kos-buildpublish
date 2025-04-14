@@ -35,17 +35,16 @@ function publish_artifact() {
     local FILENAME="$3"
     local REPO="$4"
     local REMOTE_FILENAME="$5"
-    local IS_MARKETPLACE="$6"
 
-    # TODO: marketplace should follow the artifactstore definition, not set in the artifact.
-    if [ $IS_MARKETPLACE -eq 1 ]; then
+    ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
+    # get the container and token
+    ARTSTORE_APIKEY="$(jq -r '.["studio-apikey"]' "${ARTSTORE_FILENAME}")"
+    ARTSTORE_MARKETPLACE="$(jq -r '.["marketplace"]' "${ARTSTORE_FILENAME}")"
+    if [ "${ARTSTORE_MARKETPLACE}" == "true" ]; then
         IS_MARKETPLACE="--marketplace"
     else
         unset IS_MARKETPLACE
     fi
-    ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
-    # get the container and token
-    ARTSTORE_APIKEY="$(jq -r '.["studio-apikey"]' "${ARTSTORE_FILENAME}")"
 
     echo "publish artifact: ${ID}, ${ART_QUALIFIER}, ${FILENAME}, ${REPO} ${REMOTE_FILENAME}"
 
@@ -53,7 +52,6 @@ function publish_artifact() {
     if [ "${ARTSTORE_APIKEY}" == "null" ]; then
        echo "WARNING: no studio-apikey specified.  Skipping default publish"
     else
-      # skip publishtool hack
       publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
       echo
     fi
@@ -169,17 +167,13 @@ function publish_artifact_per_configfile() {
     art_filename=$(jq -r ".artifacts[$i].filename" "${CFGFILE}")
     art_artstore=$(jq -r ".artifacts[$i].artifactstore" "${CFGFILE}")
     art_qualifier=$(jq -r ".artifacts[$i].qualifier" "${CFGFILE}")
-    art_marketplace=$(jq -r ".artifacts[$i].marketplace" "${CFGFILE}")
     REMOTE_FILENAME="$(jq -r ".artifacts[$i].remote_filename" "${CFGFILE}")"
 
     # if qualifier is unset, it's any
     if [[ "${art_qualifier}" == "null" ]]; then
     art_qualifier="any"
     fi
-    # if marketplace is unset, it's any
-    if [[ "${art_marketplace}" == "null" ]]; then
-    art_marketplace=0
-    fi
+
     # remote_filename is optional, so if it's not set, then blank it out
     if [[ "${REMOTE_FILENAME}" == "null" ]]; then
       REMOTE_FILENAME=""
@@ -206,7 +200,7 @@ function publish_artifact_per_configfile() {
     # upload the artifact to the repo
     kos_upload_artifact "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
 
-    publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}" ${art_marketplace}
+    publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
   done
 
 }

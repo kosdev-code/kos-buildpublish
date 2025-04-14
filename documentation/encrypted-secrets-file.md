@@ -44,7 +44,7 @@ Template (comments may not exist in the JSON):
 {
     "type": "<type of container>",                              # [REQUIRED] Supported options: { azurecontainer }
     "studio-apikey": "<api key for publishing to Studio>",      # [REQUIRED]
-    "market": <true or false>                                   # [OPTIONAL] set to true if the repo is a store for market artifacts.  Defaults to false.  This is used for garbage collection tooling.
+    "marketplace": <true or false>                              # [OPTIONAL] set to true if the repo is a store for market artifacts.  Defaults to false.
     
     "additional_publish_servers": [                             # [OPTIONAL] add these only if you are publishing to additional servers
         {

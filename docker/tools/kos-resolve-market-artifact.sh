@@ -29,7 +29,7 @@ if [ ! -f "${ARTSTORE_FILENAME}" ]; then
 fi
 
 # get variables from artifactstore
-IS_MARKET="$(jq -r '.market' "${ARTSTORE_FILENAME}")"
+IS_MARKET="$(jq -r '.marketplace' "${ARTSTORE_FILENAME}")"
 [ "${IS_MARKET}" != "true" ] && IS_MARKET="false"
 APIKEY="$(jq -r '.["studio-apikey"]' "${ARTSTORE_FILENAME}")"
 [ "${APIKEY}" == "null" ] && echo "invalid apikey on repo ${ARTSTORE}. Exiting..." && exit 1
