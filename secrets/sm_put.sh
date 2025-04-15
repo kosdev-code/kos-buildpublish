@@ -63,6 +63,9 @@ if [ "${GIVENURL}" != "" ] && [ "${GIVENURL}" != "${DESTURL}" ]; then
   confirm "WARNING: Destination URL does not match secrets-detail URL.  Upload anyway?"
 fi
 
+echo "testing secrets file..."
+"${THIS_SCRIPT_DIR}/test_secrets_file.sh" "${SECRETNAME}"
+
 echo "secrets file ${ENCRYPTED_SECRETS_FILE} to be uploaded to ${DESTURL}"
 
 echo "uploading..."
