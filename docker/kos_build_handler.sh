@@ -20,11 +20,21 @@ exit 1
 fi
 
 BUILD_DEF="$2"
+echo "kos_build_handler: goal is $1 with build definition $BUILD_DEF"
 
 function handleSecrets() {
     if [ "${KOSBUILD_NO_SECRETS}" == "1" ]; then
       echo "KOSBUILD_NO_SECRETS defined - secrets handling is bypassed"
       return
+    fi
+    if [ ! -z "${STUDIO_APIKEY}" ]; then 
+        echo "STUDIO_APIKEY is set, skipping secrets load"
+
+        export KOSBUILD_EASY_AUTOMATION=1
+        load_easy_automation_secrets.sh "${BUILD_DEF}"
+        return
+    else 
+        export KOSBUILD_EASY_AUTOMATION=0
     fi
     if [ -z "${KOSBUILD_SECRET_PASSWORD}" ]; then
       echo "ERROR: KOSBUILD_SECRET_PASSWORD not defined"
@@ -174,7 +184,7 @@ case $1 in
      handle_publish
      ;;
   *)
-     echo "unknown goal $0"
+     echo "unknown goal $0 goal of $1"
      ;;
 esac
 

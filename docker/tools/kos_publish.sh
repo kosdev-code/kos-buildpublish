@@ -52,6 +52,7 @@ function publish_artifact() {
     if [ "${ARTSTORE_APIKEY}" == "null" ]; then
        echo "WARNING: no studio-apikey specified.  Skipping default publish"
     else
+        #--server="http://host.docker.internal:8080" add this for local testing
       publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
       echo
     fi
