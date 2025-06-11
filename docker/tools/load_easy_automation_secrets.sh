@@ -152,14 +152,7 @@ if [ "$ARTSTORE_CONTAINER" == "null" ] || [ "$ARTSTORE_SASTOKEN" == "null" ]; th
     exit 1
 fi
 
-REPO=$(jq -r ".artifacts[0].artifactstore" "${BUILD_DEF}")
-
-if [ "${REPO}" == "null" ] || [ -z "${REPO}" ]; then
-    echo "ERROR: artifactstore not defined in build definition"
-    echo "Please specify an artifactstore in ${BUILD_DEF}"
-    exit 1
-fi
-
+REPO="default_artifact_store"
 
 # Create the artifact store configuration file to work with current tools
 mkdir -p $HOME/.kosbuild/artifactstores
