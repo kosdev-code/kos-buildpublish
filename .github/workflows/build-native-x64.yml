@@ -6,6 +6,7 @@ env:
     REGISTRY: ghcr.io
     IMAGE_NAME: ${{ github.repository }}/kos_builder-native
     TAG: x64
+    VERSION_KOS: 0.0.0-SNAPSHOT
 
 jobs:
     build-and-push-image:
@@ -41,3 +42,6 @@ jobs:
             push: true
             tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
             labels: ${{ steps.meta.outputs.labels }}
+            build-args: |
+              KOS_NATIVE_ARCH=${{ env.TAG }}
+              KOS_VERSION=${{ env.VERSION_KOS }}
