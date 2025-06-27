@@ -11,7 +11,7 @@ jobs:
     build-and-push-image:
       runs-on: ubuntu-latest
       permissions:
-         contents: write
+         contents: read
          packages: write
 
       steps:
@@ -39,5 +39,5 @@ jobs:
           with:
             context: docker
             push: true
-            tags: ${{ env.TAG }}
+            tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
             labels: ${{ steps.meta.outputs.labels }}
