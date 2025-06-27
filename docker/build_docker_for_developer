@@ -4,6 +4,42 @@ THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
 
 set -e -o pipefail
 
+usage() {
+    echo "$0 [target] [KOS Version]"
+    echo " where [target] is native-arm64, native-x64, or npmjava"
+    echo " if [target] is native, then you must specify the KOS Version"
+    exit 1
+}
+TARGET="$1"
+KOS_VERSION="$2"
+
+if [ $# -eq 0 ]; then
+    TARGET="npmjava"
+fi
+
+NATIVE=0
+NATIVE_ARCH=""
+case "$TARGET" in 
+    "native-arm64")
+        NATIVE=1
+        NATIVE_ARCH=arm64
+        ;;
+    "native-x64")
+        NATIVE=1
+        NATIVE_ARCH=x64
+        ;;
+    "npmjava")
+        ;;
+    *)
+        echo "invalid target: $1"
+        usage
+        ;;
+esac
+# require the KOS Version argument
+if [ $NATIVE -eq 1 ] && [ $# -lt 2 ]; then 
+    usage
+fi
+
 cd "${THIS_SCRIPT_DIR}"
 
 # get the kos tools
@@ -15,5 +51,15 @@ GROUPNAME="$(id -g -n "$USER")"
 GID="$(id -g)"
 
 DOCKER_IMAGE_NAME="kosbuilder-developer"
-# build the docker image, with name kosbuilder-dev
-docker build --build-arg "USER_NAME=$USER" --build-arg USER_ID=$UID --build-arg "GROUP_NAME=$GROUPNAME" --build-arg GROUP_ID=$GID -t "${DOCKER_IMAGE_NAME}" .
+if [ "$NATIVE" == "1" ]; then
+    DOCKER_IMAGE_NAME="$DOCKER_IMAGE_NAME-native-${NATIVE_ARCH}"
+fi
+
+CACHE_BUSTER="$(date +%s)"
+
+if [ $NATIVE == 1 ]; then 
+    docker build --build-arg "USER_NAME=$USER" --build-arg USER_ID=$UID --build-arg "GROUP_NAME=$GROUPNAME" --build-arg GROUP_ID=$GID \
+                 --build-arg KOS_NATIVE_ARCH=$NATIVE_ARCH --build-arg KOS_VERSION=$KOS_VERSION --build-arg CACHE_BUSTER=$CACHE_BUSTER -t "${DOCKER_IMAGE_NAME}" .
+else 
+    docker build --build-arg "USER_NAME=$USER" --build-arg USER_ID=$UID --build-arg "GROUP_NAME=$GROUPNAME" --build-arg GROUP_ID=$GID -t "${DOCKER_IMAGE_NAME}" .
+fi

@@ -139,6 +139,23 @@ function common_handling() {
      copyAppToContainer
 }
 
+# check for Native build environment
+if [ -f /usr/local/sdk/sdk.arch ]; then
+  NATIVE_ARCH="$(cat /usr/local/sdk/sdk.arch)"
+  echo "===>  NATIVE Docker Image (${NATIVE_ARCH})<==="
+  case "$NATIVE_ARCH" in
+     "x64")
+       source /usr/local/sdk/environment-setup-corei7-64-kos-linux
+	    ;;
+     "arm64")
+       source /usr/local/sdk/environment-setup-cortexa57-kos-linux
+       ;;
+     *)
+       echo "ERROR: unknown architecture $NATIVE_ARCH, native tools not setup"
+       ;;
+   esac
+fi
+
 case $1 in
   build)
      echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"

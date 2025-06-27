@@ -61,7 +61,6 @@ RUN if [ -n "$GROUP_NAME" ] && [ -n "$GROUP_ID" ] && [ -n "$USER_ID" ] && [ -n "
         useradd -m -u $USER_ID -g "${GROUP_NAME:-root}" "$USER_NAME"; \
     fi
 
-
 # Verify installations
 RUN java -version && \
     node -v && \
@@ -69,6 +68,37 @@ RUN java -version && \
     mvn -v; \
     chmod 755 /usr/local/bin/load_secrets.sh /usr/local/bin/kabtool \
               /usr/local/bin/publishtool /usr/local/bin/kos_*
+
+# Install Cross-Compilation Tools for Native development
+ARG KOS_NATIVE_ARCH
+ENV KOS_NATIVE_ARCH=${KOS_NATIVE_ARCH}
+ARG KOS_VERSION
+ARG KOS_CROSS_COMPILE_SDK_URL=https://sause2tcccknaprod0001.blob.core.windows.net/release/kos-cross-sdk-host.x64-tgt.${KOS_NATIVE_ARCH}-${KOS_VERSION}.sh
+ARG KOS_NATIVE_SDK_URL=https://sause2tcccknaprod0001.blob.core.windows.net/release/nativesdk/kos-sdk-${KOS_NATIVE_ARCH}_${KOS_VERSION}.tar.gz
+
+# for Github Builds -- make sure that this part of the build is repeated.
+ARG CACHE_BUSTER
+RUN echo Cache Buster: ${CACHE_BUSTER}
+
+# Download the OS SDK, install it to /usr/local/sdk
+RUN if [ "$KOS_NATIVE_ARCH" != "" ]; then \
+        curl -fsSL ${KOS_CROSS_COMPILE_SDK_URL} -o /tmp/sdk.sh; \
+        chmod +x /tmp/sdk.sh; \
+        mkdir -p /usr/local/sdk; \
+        /tmp/sdk.sh -d /usr/local/sdk; \
+        echo ${KOS_VERSION} > /usr/local/sdk/sdk.version; \
+        echo ${KOS_NATIVE_ARCH} > /usr/local/sdk/sdk.arch; \
+    fi
+
+# Now, install the Native add-ons for the SDK
+RUN  if [ "$KOS_NATIVE_ARCH" != "" ]; then \
+        curl -fsSL ${KOS_NATIVE_SDK_URL} -o /tmp/nativesdk.tar.gz && \
+        if [ $KOS_NATIVE_ARCH = x64 ]; then \
+            tar xf /tmp/nativesdk.tar.gz -C /usr/local/sdk/sysroots/corei7-64-kos-linux/; \
+        elif [ $KOS_NATIVE_ARCH = arm64 ]; then \
+            tar xf /tmp/nativesdk.tar.gz -C /usr/local/sdk/sysroots/cortexa57-kos-linux/; \
+        fi; \
+    fi
 
 ENTRYPOINT ["kos_build_handler.sh"]
 
