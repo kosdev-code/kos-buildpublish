@@ -5,13 +5,14 @@ THIS_SCRIPT_DIR=$(dirname "$THIS_SCRIPT")
 set -e -o pipefail
 
 usage() {
-    echo "$0 [target] [KOS Version]"
+    echo "$0 [target] [KOS Version] [OS Version]"
     echo " where [target] is native-arm64, native-x64, or npmjava"
-    echo " if [target] is native, then you must specify the KOS Version"
+    echo " if [target] is native, then you must specify the KOS Version and OS Version"
     exit 1
 }
 TARGET="$1"
 KOS_VERSION="$2"
+OS_VERSION="$3"
 
 if [ $# -eq 0 ]; then
     TARGET="npmjava"
@@ -35,8 +36,8 @@ case "$TARGET" in
         usage
         ;;
 esac
-# require the KOS Version argument
-if [ $NATIVE -eq 1 ] && [ $# -lt 2 ]; then 
+# require the KOS/OS Version arguments
+if [ $NATIVE -eq 1 ] && [ $# -lt 3 ]; then 
     usage
 fi
 
@@ -47,13 +48,15 @@ cd "${THIS_SCRIPT_DIR}"
 
 DOCKER_IMAGE_NAME="kosbuilder"
 if [ "$NATIVE" == "1" ]; then
-    DOCKER_IMAGE_NAME="$DOCKER_IMAGE_NAME-native-${NATIVE_ARCH}"
+    # Drop -SNAPSHOT - we can't have capitals in the tag, and we ideally should be working towards a proper version which would be replaced.
+    MOD_KOS_VERSION="${KOS_VERSION%-SNAPSHOT}"
+    DOCKER_IMAGE_NAME="$DOCKER_IMAGE_NAME-native-${NATIVE_ARCH}_${MOD_KOS_VERSION}"
 fi
 
 CACHE_BUSTER="$(date +%s)"
 
 if [ $NATIVE == 1 ]; then 
-    docker build --build-arg KOS_NATIVE_ARCH=$NATIVE_ARCH --build-arg KOS_VERSION=$KOS_VERSION --build-arg CACHE_BUSTER=$CACHE_BUSTER -t "${DOCKER_IMAGE_NAME}" .
+    docker build --build-arg KOS_NATIVE_ARCH=$NATIVE_ARCH --build-arg OS_VERSION=$OS_VERSION --build-arg KOS_VERSION=$KOS_VERSION --build-arg CACHE_BUSTER=$CACHE_BUSTER -t "${DOCKER_IMAGE_NAME}" .
 else 
     docker build -t "${DOCKER_IMAGE_NAME}" .
 fi

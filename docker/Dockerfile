@@ -73,7 +73,8 @@ RUN java -version && \
 ARG KOS_NATIVE_ARCH
 ENV KOS_NATIVE_ARCH=${KOS_NATIVE_ARCH}
 ARG KOS_VERSION
-ARG KOS_CROSS_COMPILE_SDK_URL=https://sause2tcccknaprod0001.blob.core.windows.net/release/kos-cross-sdk-host.x64-tgt.${KOS_NATIVE_ARCH}-${KOS_VERSION}.sh
+ARG OS_VERSION
+ARG KOS_CROSS_COMPILE_SDK_URL=https://sause2tcccknaprod0001.blob.core.windows.net/release/kos-cross-sdk-host.x64-tgt.${KOS_NATIVE_ARCH}-${OS_VERSION}.sh
 ARG KOS_NATIVE_SDK_URL=https://sause2tcccknaprod0001.blob.core.windows.net/release/nativesdk/kos-sdk-${KOS_NATIVE_ARCH}_${KOS_VERSION}.tar.gz
 
 # for Github Builds -- make sure that this part of the build is repeated.

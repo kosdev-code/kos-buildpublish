@@ -6,7 +6,8 @@ env:
     REGISTRY: ghcr.io
     IMAGE_NAME: ${{ github.repository }}/kos_builder-native
     TAG: arm64
-    VERSION_KOS: 0.0.0-SNAPSHOT
+    VERSION_KOS: 0.1.1-SNAPSHOT
+    VERSION_OS: 0.1.1-SNAPSHOT
 
 jobs:
     build-and-push-image:
@@ -31,17 +32,22 @@ jobs:
           with:
              images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-        - name: Get kOS Tools
+        - name: Get KOS Tools
           run: |
                docker/kos_gettools
+
+               # Drop the -SNAPSHOT suffix using parameter expansion
+               KOS_VERSION_VAR="${{ env.VERSION_KOS }}"
+               echo KOS_VERSION_CLEAN=${KOS_VERSION_VAR%-SNAPSHOT} >>"$GITHUB_ENV"
 
         - name: Build and push Docker image
           uses: docker/build-push-action@v6
           with:
             context: docker
             push: true
-            tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+            tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}_${{ env.KOS_VERSION_CLEAN }}
             labels: ${{ steps.meta.outputs.labels }}
             build-args: |
               KOS_NATIVE_ARCH=${{ env.TAG }}
               KOS_VERSION=${{ env.VERSION_KOS }}
+              OS_VERSION=${{ env.VERSION_OS }}
