@@ -50,6 +50,14 @@ function replace_sas_tokens_artifactstore() {
       # Extract the first word before the first dot
       ACCOUNT=$(echo "$host" | cut -d'.' -f1)
       CONTAINERNAME=$(echo "$CONTAINER" | cut -d'/' -f4)
+
+      # if ACCOUNTNAME is set, only replace if account name matches
+      if [ ! -z "${ACCOUNTNAME}" ]; then
+        if [ "${ACCOUNTNAME}" != "${ACCOUNT}" ]; then
+          echo "not replacing token for account: ${ACCOUNT}"
+          return
+        fi
+      fi
       replace_sas_in_json_file "${JSONFILE}" "sastoken"
       replace_sas_in_json_file "${JSONFILE}" "gc-sastoken"
     fi
@@ -125,11 +133,14 @@ function iterate_on_usersecrets() {
 
 }
 
+# argument: if accountname is passed, only replace sas tokens where account name matches
+ACCOUNTNAME="$1"
 
 cd "${THIS_SCRIPT_DIR}"
-
 source "${THIS_SCRIPT_DIR}/sm_funcs.source"
-echo "this tool will iterate on your artifactstores and usersecrets, replacing the sastoken and garbage collection token with a new one good for 90 days"
+
+
+echo "this tool will iterate on your artifactstores and usersecrets, replacing all sastoken and garbage collection token with a new one good for 90 days"
 echo "we assume you have already logged into your azure account using az login"
 confirm "continue?"
 
