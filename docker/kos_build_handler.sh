@@ -62,7 +62,10 @@ function copyAppToContainer() {
    if [ "${KOSBUILDER_NO_CONTAINER}" == "1" ]; then
       return
    fi
-   if [ "${KOSBUILDER_DEV}" == "1" ]; then 
+
+   cd
+
+   if [ "${KOSBUILDER_DEV}" == "1" ]; then
       echo "kos_build_handler: skipping copy to the container due to KOSBUILDER_DEV for user $USER"
       cd ~/work
    else
@@ -134,7 +137,6 @@ function setup_path() {
    export PATH="$PATH:$HOME/bin"
 }
 function common_handling() {
-     cd
      handleSecrets
      copyAppToContainer
 }
