@@ -94,6 +94,11 @@ function replace_usersecrets_sas_token() {
     return
   fi
 
+  if [ "${ACCOUNTNAME}" != "${__AUTOMATION_SAS_ACCOUNT}" ]; then
+    echo "skipping replacement in file $FILE"
+    return
+  fi
+
   EXPIRY="$(date -u -d "$(date +%Y-%m-%d) + 90 days" +%Y-%m-%dT%H:%M:%SZ)"
 
   echo "request sas for $FILE, container $__AUTOMATION_SAS_CONTAINER, permissions ${__AUTOMATION_SAS_PERMISSIONS}"
@@ -134,7 +139,11 @@ function iterate_on_usersecrets() {
 }
 
 # argument: if accountname is passed, only replace sas tokens where account name matches
-ACCOUNTNAME="$1"
+if [ $# -eq 0 ]; then
+  ACCOUNTNAME="sause2tcccknaprod0001"
+else
+  ACCOUNTNAME="$1"
+fi
 
 cd "${THIS_SCRIPT_DIR}"
 source "${THIS_SCRIPT_DIR}/sm_funcs.source"
