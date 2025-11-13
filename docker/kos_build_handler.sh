@@ -27,13 +27,13 @@ function handleSecrets() {
       echo "KOSBUILD_NO_SECRETS defined - secrets handling is bypassed"
       return
     fi
-    if [ ! -z "${STUDIO_APIKEY}" ]; then 
+    if [ ! -z "${STUDIO_APIKEY}" ]; then
         echo "STUDIO_APIKEY is set, skipping secrets load"
 
         export KOSBUILD_EASY_AUTOMATION=1
         load_easy_automation_secrets.sh "${BUILD_DEF}"
         return
-    else 
+    else
         export KOSBUILD_EASY_AUTOMATION=0
     fi
     if [ -z "${KOSBUILD_SECRET_PASSWORD}" ]; then
@@ -128,7 +128,7 @@ function handle_build() {
 }
 
 function handle_publish() {
-   kos_publish.sh "${BUILD_DEF}"
+   kos_publish_automation.sh "${BUILD_DEF}"
 }
 
 function setup_path() {

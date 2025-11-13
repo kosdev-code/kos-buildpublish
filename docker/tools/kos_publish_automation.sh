@@ -219,7 +219,7 @@ echo " => ${BUILD_DEFINITION}"
 PREPUBLISH_CMD=$(jq -r ".prepublish_cmd" "${BUILD_DEF}")
 if [ "${PREPUBLISH_CMD}" != "null" ]; then
   echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
-  echo "kos_publish.sh: pre-publish with command ${PREPUBLISH_CMD}"
+  echo "kos_publish_automation.sh: pre-publish with command ${PREPUBLISH_CMD}"
   ${PREPUBLISH_CMD}
 fi
 
@@ -241,6 +241,6 @@ publish_artifact_per_configfile "${BUILD_DEF}"
 POSTPUBLISH_CMD=$(jq -r ".postpublish_cmd" "${BUILD_DEF}")
 if [ "${POSTPUBLISH_CMD}" != "null" ]; then
   echo "~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~"
-  echo "kos_publish.sh: post-publish with command ${POSTPUBLISH_CMD}"
+  echo "kos_publish_automation.sh: post-publish with command ${POSTPUBLISH_CMD}"
   ${POSTPUBLISH_CMD}
 fi
