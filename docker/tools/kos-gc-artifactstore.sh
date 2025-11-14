@@ -31,6 +31,7 @@ function getMarketArtifactInstances() {
     CONTAINERURL="$4"
 
     INSTANCES=$(curl -s -f "${SERVER}/api/orgs/market/instances/${REPO}?apiKey=${APIKEY}")
+
     STATUS=$(echo "${INSTANCES}" | jq -r ".status")
     VERSION_MAJOR=$(echo "${INSTANCES}" | jq -r ".version.major")
 
@@ -100,7 +101,7 @@ function getAzureStorageFileList() {
   local ABSURL="$1"
   local SASTKN="$2"
   local CONTAINERFILES
-  
+
   LAST_CONTAINERLIST=$(curl -f -s -X GET "${ABSURL}?restype=container&comp=list&${SASTKN}" -H "x-ms-version: 2020-10-02")
   one_day_ago=$(date -d "1 day ago" +%s)
   # only get files from at least a day ago to prevent races
@@ -174,16 +175,16 @@ if [ "${CONTAINER}" == "null" ] || [ "${SASTOKEN}" == "null" ]; then
 fi
 
 echo "query studio server ${DEFAULT_STUDIO_SERVER} for artifacts in ${ARTSTORE}"
-[ "${IS_MARKET}" == true ] && STUDIO_INSTANCES=$(getMarketArtifactInstances "${DEFAULT_STUDIO_SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
-[ "${IS_MARKET}" == false ] && STUDIO_INSTANCES=$(getNonmarketArtifactInstances "${DEFAULT_STUDIO_SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
+[ "${IS_MARKET}" == "true" ] && STUDIO_INSTANCES=$(getMarketArtifactInstances "${DEFAULT_STUDIO_SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
+[ "${IS_MARKET}" == "false" ] && STUDIO_INSTANCES=$(getNonmarketArtifactInstances "${DEFAULT_STUDIO_SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
 
 if [ $STUDIO_SERVER_COUNT -ne 0 ]; then
-  for j in $( eval echo {0..$((STUDIO_SERVER_COUNT-1))} ); do    
+  for j in $( eval echo {0..$((STUDIO_SERVER_COUNT-1))} ); do
     SERVER=$(jq -r ".additional_publish_servers[$j].server" ${ARTSTORE_FILENAME})
     SERVER="${SERVER/wss:\/\//https:\/\/}"
-    echo "query additional studio server ${SERVER} for artifacts in ${ARTSTORE}"    
-    [ "${IS_MARKET}" == true ] && STUDIO_INSTANCES_ADD=$(getMarketArtifactInstances "${SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
-    [ "${IS_MARKET}" == false ] && STUDIO_INSTANCES_ADD=$(getNonmarketArtifactInstances "${SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
+    echo "query additional studio server ${SERVER} for artifacts in ${ARTSTORE}"
+    [ "${IS_MARKET}" == "true" ] && STUDIO_INSTANCES_ADD=$(getMarketArtifactInstances "${SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
+    [ "${IS_MARKET}" == "false" ] && STUDIO_INSTANCES_ADD=$(getNonmarketArtifactInstances "${SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
     STUDIO_INSTANCES="${STUDIO_INSTANCES}${STUDIO_INSTANCES_ADD}"
   done
 fi
