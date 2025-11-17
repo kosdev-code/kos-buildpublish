@@ -41,12 +41,15 @@ function handleSecrets() {
       exit 1
     fi
 
+    # clear out the .kosbuild directory before starting
+    rm -rf "${HOME}/.kosbuild"
     LOCAL_SECRETS_FILE=/mnt/secrets/secrets.7z
     if [ -f "${LOCAL_SECRETS_FILE}" ]; then
        load_secrets.sh "${LOCAL_SECRETS_FILE}"
     else
        if [ ! -z "${KOSBUILD_SECRET_URL}" ]; then
          DL_SECRETS_FILE="/tmp/secrets.7z"
+         rm -f "${DL_SECRETS_FILE}"
          echo "downloading secrets file from ${KOSBUILD_SECRET_URL}"
          curl -f -o "${DL_SECRETS_FILE}" "${KOSBUILD_SECRET_URL}"
          load_secrets.sh "${DL_SECRETS_FILE}"

@@ -23,13 +23,15 @@ if [ ! -f "${GITHUB_TOKEN_FILE}" ]; then
 fi
 
 function usage() {
-    echo "usage: $0 <secretsname> <github org> <repo>"
+    echo "usage: $0 <secretsname> <github org> <repo> [SECRETS_PREFIX]"
     echo " Purpose: will configure the Github Action Secrets for a given ORG and REPO"
     echo "          including both the Secrets URL and the Password"
     echo
     echo " where secretsname is the name of the secrets from the ${DETAIL_DIR} directory"
     echo " <github org> is the name of the org in Github"
     echo " <repo> is the name of the repo"
+    echo " if SECRETS_PREFIX is specified, instead of setting KOSBUILD_SECRET_URL and KOSBUILD_SECRET_PASSWORD"
+    echo "  then SECRETS_PREFIX will be prefix the name. e.g. if TCCC_, it would set TCCC_KOSBUILD_SECRET_URL and TCCC_KOSBUILD_SECRET_PASSWORD" 
     echo
     echo " available secrets: "
     getSecretsIds
@@ -46,6 +48,7 @@ fi
 SECRETNAME="$1"
 GITHUBORG="$2"
 GITHUBREPO="$3"
+SECRETS_PREFIX="$4"
 
 SECRETS_DETAIL_FILE="$(getSecretDetailFilename "$SECRETNAME")"
 ENCRYPTED_SECRETS_FILE="$(getEncryptedSecretsFilename "$SECRETNAME")"
@@ -64,6 +67,10 @@ fi
 if [ ! -f "${ENCRYPTED_SECRETS_FILE}" ]; then
   echo "error: file not found: ${ENCRYPTED_SECRETS_FILE}"
   exit 1
+fi
+
+if [ "${SECRETS_PREFIX}" != "" ]; then
+  confirm "Secrets Prefix detected.  Publish ${SECRETS_PREFIX}KOSBUILD_SECRET_URL and ${SECRETS_PREFIX}KOSBUILD_SECRET_PASSWORD ?"
 fi
 
 JSON_FILE="${DETAIL_DIR}/log-github-${SECRETNAME}.json"
@@ -86,12 +93,12 @@ fi
 # get the github api token which can configure secrets.
 API_KEY="$(jq -r '.token // ""' "${GITHUB_TOKEN_FILE}")"
 
-echo "setting Secrets URL (KOSBUILD_SECRET_URL) to ${GITHUBORG}/${GITHUBREPO}"
-setRepoSecret "${GITHUBORG}/${GITHUBREPO}" "KOSBUILD_SECRET_URL" "${DESTURL}"
+echo "setting Secrets URL (${SECRETS_PREFIX}KOSBUILD_SECRET_URL) to ${GITHUBORG}/${GITHUBREPO}"
+setRepoSecret "${GITHUBORG}/${GITHUBREPO}" "${SECRETS_PREFIX}KOSBUILD_SECRET_URL" "${DESTURL}"
 
-echo "setting Secrets Password (KOSBUILD_SECRET_PASSWORD) to ${GITHUBORG}/${GITHUBREPO}"
-setRepoSecret "${GITHUBORG}/${GITHUBREPO}" "KOSBUILD_SECRET_PASSWORD" "${DETAIL_SECRETS_PASSWORD}"
+echo "setting Secrets Password (${SECRETS_PREFIX}KOSBUILD_SECRET_PASSWORD) to ${GITHUBORG}/${GITHUBREPO}"
+setRepoSecret "${GITHUBORG}/${GITHUBREPO}" "${SECRETS_PREFIX}KOSBUILD_SECRET_PASSWORD" "${DETAIL_SECRETS_PASSWORD}"
 
 # we will log each repository that we configure and the date so that we have a record of it.
-update_json_entries "${JSON_FILE}" "${GITHUBORG}" "${GITHUBREPO}"
+update_json_entries "${JSON_FILE}" "${GITHUBORG}" "${GITHUBREPO}" "${SECRETS_PREFIX}"
 

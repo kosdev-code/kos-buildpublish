@@ -168,7 +168,7 @@ APIKEY="$(jq -r '.["studio-apikey"]' "${ARTSTORE_FILENAME}")"
 [ "${APIKEY}" == "null" ] && echo "invalid apikey on repo ${ARTSTORE}. Exiting..." && exit 1
 STUDIO_SERVER_COUNT=$(jq '.additional_publish_servers | length' ${ARTSTORE_FILENAME})
 CONTAINER="$(jq -r '.["container"]' "${ARTSTORE_FILENAME}")"
-SASTOKEN="$(jq -r '.["gc-sastoken"]' "${ARTSTORE_FILENAME}")"
+SASTOKEN="$(jq -r '.["sastoken"]' "${ARTSTORE_FILENAME}")"
 if [ "${CONTAINER}" == "null" ] || [ "${SASTOKEN}" == "null" ]; then
   echo "ERROR: container or sastoken is null"
   exit 1
