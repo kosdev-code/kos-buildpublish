@@ -42,7 +42,7 @@ function handleSecrets() {
     fi
 
     # clear out the .kosbuild directory before starting
-    rm -rf "${HOME}/.kosbuild"
+    rm -rf "${HOME}/.kosbuild/artifactstores" "${HOME}/.kosbuild/keysets" "${HOME}/.kosbuild/usersecrets"
     LOCAL_SECRETS_FILE=/mnt/secrets/secrets.7z
     if [ -f "${LOCAL_SECRETS_FILE}" ]; then
        load_secrets.sh "${LOCAL_SECRETS_FILE}"
