@@ -12,7 +12,7 @@
 # - $HOME/.kosbuild/artifactstores/<artifactstore>.json: JSON file with artifact store configuration
 
 DEFAULT_STUDIO_SERVER="https://studio.kosdev.com"
-TEST_SERVER="host.docker.internal:8080"
+LOCAL_TEST_SERVER="host.docker.internal:8080"
 SERVER=${DEFAULT_STUDIO_SERVER}
 
 BUILD_DEF=$1
