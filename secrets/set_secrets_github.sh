@@ -11,38 +11,37 @@ AZURE_TOKEN_FILE="${DETAIL_DIR}/azure-token.json"
 # The Github Token File contains details on how to publish secrets
 GITHUB_TOKEN_FILE="${DETAIL_DIR}/github-token.json"
 
-
 if [ ! -f "${AZURE_TOKEN_FILE}" ]; then
   echo "error: azure token not found: ${AZURE_TOKEN_FILE}"
   exit 1
 fi
 
 if [ ! -f "${GITHUB_TOKEN_FILE}" ]; then
-  echo "error: azure token not found: ${AZURE_TOKEN_FILE}"
+  echo "error: github token not found: ${GITHUB_TOKEN_FILE}"
   exit 1
 fi
 
 function usage() {
-    echo "usage: $0 <secretsname> <github org> <repo> [SECRETS_PREFIX]"
-    echo " Purpose: will configure the Github Action Secrets for a given ORG and REPO"
-    echo "          including both the Secrets URL and the Password"
-    echo
-    echo " where secretsname is the name of the secrets from the ${DETAIL_DIR} directory"
-    echo " <github org> is the name of the org in Github"
-    echo " <repo> is the name of the repo"
-    echo " if SECRETS_PREFIX is specified, instead of setting KOSBUILD_SECRET_URL and KOSBUILD_SECRET_PASSWORD"
-    echo "  then SECRETS_PREFIX will be prefix the name. e.g. if TCCC_, it would set TCCC_KOSBUILD_SECRET_URL and TCCC_KOSBUILD_SECRET_PASSWORD" 
-    echo
-    echo " available secrets: "
-    getSecretsIds
-    for n in "${SECRET_NAMES_ARRAY[@]}"; do
-        echo "  $n"
-    done
-    exit 1
+  echo "usage: $0 <secretsname> <github org> <repo> [SECRETS_PREFIX]"
+  echo " Purpose: will configure the Github Action Secrets for a given ORG and REPO"
+  echo "          including both the Secrets URL and the Password"
+  echo
+  echo " where secretsname is the name of the secrets from the ${DETAIL_DIR} directory"
+  echo " <github org> is the name of the org in Github"
+  echo " <repo> is the name of the repo"
+  echo " if SECRETS_PREFIX is specified, instead of setting KOSBUILD_SECRET_URL and KOSBUILD_SECRET_PASSWORD"
+  echo "  then SECRETS_PREFIX will be prefix the name. e.g. if TCCC_, it would set TCCC_KOSBUILD_SECRET_URL and TCCC_KOSBUILD_SECRET_PASSWORD"
+  echo
+  echo " available secrets: "
+  getSecretsIds
+  for n in "${SECRET_NAMES_ARRAY[@]}"; do
+    echo "  $n"
+  done
+  exit 1
 }
 
 if [ $# -lt 3 ]; then
-usage
+  usage
 fi
 
 SECRETNAME="$1"
@@ -86,7 +85,7 @@ DETAIL_SECRETS_PASSWORD="$(jq -r '.password // ""' "${SECRETS_DETAIL_FILE}")"
 if [ ! -z "${DETAIL_SECRETS_URL}" ] && [ "${DETAIL_SECRETS_URL}" != "${DESTURL}" ]; then
   echo "URL from Secrets-Detail:  ${DETAIL_SECRETS_URL}"
   echo "Secrets URL:              ${DESTURL}"
-  
+
   confirm "WARNING: Secrets URL does not match secrets-detail URL. We will use Secrets URL. Continue?"
 fi
 
@@ -101,4 +100,3 @@ setRepoSecret "${GITHUBORG}/${GITHUBREPO}" "${SECRETS_PREFIX}KOSBUILD_SECRET_PAS
 
 # we will log each repository that we configure and the date so that we have a record of it.
 update_json_entries "${JSON_FILE}" "${GITHUBORG}" "${GITHUBREPO}" "${SECRETS_PREFIX}"
-
