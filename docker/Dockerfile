@@ -12,7 +12,7 @@ ENV PATH=$JAVA_HOME/bin:$PATH
 RUN userdel -r node
 
 # Install Maven
-ARG MAVEN_VERSION=3.9.11
+ARG MAVEN_VERSION=3.9.12
 ARG MAVEN_URL=https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
 RUN curl -fsSL ${MAVEN_URL} -o /tmp/apache-maven.tar.gz && \
     tar -xzf /tmp/apache-maven.tar.gz -C /opt && \
