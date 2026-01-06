@@ -13,19 +13,19 @@ check_sas_token_expiration() {
   fi
 
   # Decode the URL-encoded expiry time
-  local decoded_expiry_time=$(echo "$expiry_time" | sed 's/%[0-9A-Fa-f][0-9A-Fa-f]/\\x&/g')
+  local decoded_expiry_time=$(echo "$expiry_time" | sed 's/%3A/:/g')
 
   # Convert the ISO 8601 expiry time to Unix timestamp
   local expiry_timestamp=$(date -d "$decoded_expiry_time" +%s)
 
   if [[ -z "$expiry_timestamp" || "$expiry_timestamp" -eq 0 ]]; then
-      echo "Error: Invalid or unparsable expiry time: $decoded_expiry_time"
-      return 1
+    echo "Error: Invalid or unparsable expiry time: $decoded_expiry_time"
+    return 1
   fi
 
   # Get the current Unix timestamp
   local current_timestamp=$(date +%s)
-  
+
   # Compare timestamps
   if [[ "$expiry_timestamp" -gt "$current_timestamp" ]]; then
     local remaining_seconds=$((expiry_timestamp - current_timestamp))
@@ -44,10 +44,10 @@ check_sas_token_expiration() {
 }
 
 if [ $# -lt 2 ]; then
-   echo "usage: $0 <sas token> <sas token name>"
-   echo " script will check wthether the sas token is valid, and will output a message"
-   echo " and exit with an error code if the sas token is invalid."
-   exit 1
+  echo "usage: $0 <sas token> <sas token name>"
+  echo " script will check wthether the sas token is valid, and will output a message"
+  echo " and exit with an error code if the sas token is invalid."
+  exit 1
 fi
 
 TOKEN="$1"
@@ -56,8 +56,8 @@ TOKENNAME="$2"
 echo "checking SAS token ${TOKENNAME}..."
 STATUS="$(check_sas_token_expiration "${TOKEN}")"
 if [ "${STATUS}" == "invalid" ]; then
-echo "ERROR: SAS token ${TOKENNAME} is expired"
-exit 1
+  echo "ERROR: SAS token ${TOKENNAME} is expired"
+  exit 1
 fi
+echo "SAS token ${TOKENNAME} is valid"
 exit 0
-

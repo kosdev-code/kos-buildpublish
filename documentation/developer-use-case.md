@@ -51,7 +51,7 @@ SECRETID=mysecretsdir source kosbuilder.env.source
 SECRETID=mysecretsdir source kosbuilder-developer.env.source
 ```
 
-The kosbuild environment establishes 2 aliases in your shell environment.  The *kosbuild* alias starts a docker container with the docker image and performs the specified goal.  The *kosbuild_debug* alias starts a docker container witht he docker image, performs the specified goal, and then when done, a shell is run in that environment for you to examine the output.  We expect that *kosbuild_debug* could be useful for resolving some build issues.
+The kosbuild environment establishes 2 aliases in your shell environment.  The *kosbuild* alias starts a docker container with the docker image and performs the specified goal.  The *kosbuild_debug* alias starts a docker container with the docker image, performs the specified goal, and then when done, a shell is run in that environment for you to examine the output.  We expect that *kosbuild_debug* could be useful for resolving some build issues.
 
 There are several arguments you can use to the kosbuild (or kos_build_debug) alias: build, buildpublish, and shell.
 
