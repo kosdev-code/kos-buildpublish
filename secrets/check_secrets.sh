@@ -13,7 +13,7 @@ error() {
   echo "ERROR: $msg"
   if [ "$stoponerror" -eq 1 ]; then
     exit 1
-  fi  
+  fi
 }
 
 get_sas_token_expiredays() {
@@ -34,8 +34,8 @@ get_sas_token_expiredays() {
   local expiry_timestamp=$(date -d "$decoded_expiry_time" +%s)
 
   if [[ -z "$expiry_timestamp" || "$expiry_timestamp" -eq 0 ]]; then
-      echo "Error: Invalid or unparsable expiry time: $decoded_expiry_time"
-      return 1
+    echo "Error: Invalid or unparsable expiry time: $decoded_expiry_time"
+    return 1
   fi
 
   # Get the current Unix timestamp
@@ -56,43 +56,43 @@ get_sas_token_expiredays() {
   return 0
 }
 
-function check_artifactstore_dir () {
-    local asdir
-    local repo
+function check_artifactstore_dir() {
+  local asdir
+  local repo
 
-    asdir="$1"
-    for repo in "${asdir}/"*.json; do
-       if [ -f "${repo}" ]; then
-           sastoken="$(jq -r .sastoken ${repo})"
-           if [ "$sastoken" == "null" ]; then
-              continue
-           fi
+  asdir="$1"
+  for repo in "${asdir}/"*.json; do
+    if [ -f "${repo}" ]; then
+      sastoken="$(jq -r .sastoken ${repo})"
+      if [ "$sastoken" == "null" ]; then
+        continue
+      fi
 
-           DAYSLEFT=$(get_sas_token_expiredays "${sastoken}")
-           if [ $? -eq 0 ]; then
-            echo "${DAYSLEFT} days left in $(basename ${repo})"
+      DAYSLEFT=$(get_sas_token_expiredays "${sastoken}")
+      if [ $? -eq 0 ]; then
+        echo "${DAYSLEFT} days left in $(basename ${repo})"
 
-            if [ "$DAYSLEFT" == "0" ]; then
-               error "SAS token expired"
-            fi
-           fi
+        if [ "$DAYSLEFT" == "0" ]; then
+          error "SAS token expired"
+        fi
+      fi
 
-         sastoken="$(jq -r '.["gc-sastoken"]' ${repo})"
-         if [ "${sastoken}" == "null" ]; then
-            continue
-         fi
-         DAYSLEFT=$(get_sas_token_expiredays "${sastoken}")
-         echo "${DAYSLEFT} days left in $(basename ${repo}) [GC Token]"
-         if [ "$DAYSLEFT" == "0" ]; then
-               error "SAS token expired"
-          fi
-       fi
-    done
+      sastoken="$(jq -r '.["gc-sastoken"]' ${repo})"
+      if [ "${sastoken}" == "null" ]; then
+        continue
+      fi
+      DAYSLEFT=$(get_sas_token_expiredays "${sastoken}")
+      echo "${DAYSLEFT} days left in $(basename ${repo}) [GC Token]"
+      if [ "$DAYSLEFT" == "0" ]; then
+        error "SAS token expired"
+      fi
+    fi
+  done
 }
 
 check_json_validity() {
   local file="$1"
-  jq '.' < "$file" &> /dev/null
+  jq '.' <"$file" &>/dev/null
   local result=$?
   if [ "$result" -eq 0 ]; then
     return 0
@@ -103,7 +103,7 @@ check_json_validity() {
 
 check_json_files() {
   local path="$1"
-  
+
   for file in "$path"/*.json; do
     if ! $(check_json_validity "$file"); then
       error "invalid JSON file: $file"
@@ -112,32 +112,32 @@ check_json_files() {
   done
 }
 
-function check_secrets_dir () {
-    local secretsdir
-    local artifactstoredir
+function check_secrets_dir() {
+  local secretsdir
+  local artifactstoredir
 
-    secretsdir="$1"
-    artifactstoredir="${secretsdir}/artifactstores"
+  secretsdir="$1"
+  artifactstoredir="${secretsdir}/artifactstores"
 
-    echo "[${secretsdir}]"
-    if [ -d "${artifactstoredir}" ]; then
-       check_artifactstore_dir "${artifactstoredir}" || error "invalid artifact store ${artifactstoredir}"
-       check_json_files "${artifactstoredir}" || error "invalid json files found in ${artifactstoredir}"
-    fi
+  echo "[${secretsdir}]"
+  if [ -d "${artifactstoredir}" ]; then
+    check_artifactstore_dir "${artifactstoredir}" || error "invalid artifact store ${artifactstoredir}"
+    check_json_files "${artifactstoredir}" || error "invalid json files found in ${artifactstoredir}"
+  fi
 }
 
 declare -a EXCLUDED_DIRS="(developer)"
 function isExcluded() {
-    local dir="$1"
-    for excluded_dir in "${EXCLUDED_DIRS[@]}"; do
-      if [[ "$dir" == "$excluded_dir" ]]; then
-        return 0 # True (excluded)
-      fi
-    done
-    return 1 # False (not excluded)
+  local dir="$1"
+  for excluded_dir in "${EXCLUDED_DIRS[@]}"; do
+    if [[ "$dir" == "$excluded_dir" ]]; then
+      return 0 # True (excluded)
+    fi
+  done
+  return 1 # False (not excluded)
 }
 
-
+echo "I think this is the actual starting point with this env var $SECRET_WORKTOP_DIR"
 cd "$SECRET_WORKTOP_DIR"
 for dir in *; do
   if [ -d "${dir}" ]; then
