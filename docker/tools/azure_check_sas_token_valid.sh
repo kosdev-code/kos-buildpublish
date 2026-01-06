@@ -17,6 +17,7 @@ check_sas_token_expiration() {
 
   # Convert the ISO 8601 expiry time to Unix timestamp
   local expiry_timestamp=$(date -d "$decoded_expiry_time" +%s)
+  echo "expiry timestamp: $expiry_timestamp"
 
   if [[ -z "$expiry_timestamp" || "$expiry_timestamp" -eq 0 ]]; then
     echo "Error: Invalid or unparsable expiry time: $decoded_expiry_time"
@@ -31,10 +32,9 @@ check_sas_token_expiration() {
     local remaining_seconds=$((expiry_timestamp - current_timestamp))
     local remaining_minutes=$((remaining_seconds / 60))
     local remaining_hours=$((remaining_minutes / 60))
-    local remaining_days=$((remaining_hours / 24))
 
-    # we need the SAS token to be valid at least for 1 day
-    if [[ $remaining_days -gt 0 ]]; then
+    # we need the SAS token to be valid at least for 1 hour
+    if [[ $remaining_hours -gt 0 ]]; then
       echo "valid"
       return 0
     fi
