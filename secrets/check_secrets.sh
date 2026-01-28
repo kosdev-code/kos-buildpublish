@@ -137,7 +137,6 @@ function isExcluded() {
   return 1 # False (not excluded)
 }
 
-echo "I think this is the actual starting point with this env var $SECRET_WORKTOP_DIR"
 cd "$SECRET_WORKTOP_DIR"
 for dir in *; do
   if [ -d "${dir}" ]; then
