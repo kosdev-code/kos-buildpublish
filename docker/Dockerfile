@@ -27,11 +27,18 @@ ENV PATH=$MAVEN_HOME/bin:$PATH
 ENV JAVA_CMD=java
 ENV KOS_INSTALL_PATH="/usr/local"
 
+RUN apt-get update && apt-get install -y locales \
+    && sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
+    && locale-gen
+
 # Install 7z
-RUN apt-get update && \
-    apt-get install -y p7zip-full jq curl unzip git-lfs squashfs-tools-ng zip zstd xmlstarlet gettext rsync gawk &&  \
-    apt-get install -y golang nsis xorriso cpio && \
+RUN apt-get install -y p7zip-full jq curl unzip git-lfs squashfs-tools-ng zip zstd xmlstarlet gettext rsync gawk &&  \
+    apt-get install -y golang nsis xorriso cpio sudo && \
     rm -rf /var/lib/apt/lists/*
+
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
 
 # azcopy is downloaded with the kos_gettools step
 COPY "download/azcopy/current/azcopy" /usr/local/bin
@@ -59,6 +66,8 @@ ARG GROUP_ID
 RUN if [ -n "$GROUP_NAME" ] && [ -n "$GROUP_ID" ] && [ -n "$USER_ID" ] && [ -n "$USER_NAME" ]; then \
         groupadd -g $GROUP_ID "$GROUP_NAME"; \
         useradd -m -u $USER_ID -g "${GROUP_NAME:-root}" "$USER_NAME"; \
+        echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USER_NAME; \
+        chmod 0440 /etc/sudoers.d/$USER_NAME; \
     fi
 
 # Verify installations
