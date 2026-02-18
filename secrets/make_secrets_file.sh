@@ -12,7 +12,7 @@ source "${THIS_SCRIPT_DIR}/sm_funcs.source"
 #  keysets/*.keyset : keysets used for KAB creation
 
 function usage() {
-    echo "usage: $0 <secretsname>"
+  echo "usage: $0 <secretsname>"
 }
 
 if [ $# -lt 1 ]; then
@@ -79,22 +79,22 @@ fi
 if [ "${KOSBUILD_SECRET_PASSWORD}" == "" ]; then
   SECRET_DETAIL_FILENAME="$(getSecretDetailFilename "$SECRETNAME")"
   if [ -f "${SECRET_DETAIL_FILENAME}" ]; then
-     KOSBUILD_SECRET_PASSWORD="$(jq -r '.password // ""' "${SECRET_DETAIL_FILENAME}")"
-     echo "using password from secret-detail file"
+    KOSBUILD_SECRET_PASSWORD="$(jq -r '.password // ""' "${SECRET_DETAIL_FILENAME}")"
+    echo "using password from secret-detail file"
   else
     SECRET_PASSWORD_FILE="${SECRETS_DIR}/secrets_password"
     if [ -f "${SECRET_PASSWORD_FILE}" ]; then
-        KOSBUILD_SECRET_PASSWORD=$(cat "${SECRET_PASSWORD_FILE}")
-        echo "using password from file ${SECRET_PASSWORD_FILE}"
+      KOSBUILD_SECRET_PASSWORD=$(cat "${SECRET_PASSWORD_FILE}")
+      echo "using password from file ${SECRET_PASSWORD_FILE}"
     fi
   fi
 fi
 
 if [ "${KOSBUILD_SECRET_PASSWORD}" != "" ]; then
-SECRET_ARG_7Z="-p${KOSBUILD_SECRET_PASSWORD}"
+  SECRET_ARG_7Z="-p${KOSBUILD_SECRET_PASSWORD}"
 else
-echo "error: KOSBUILD_SECRET_PASSWORD not defined - it must be defined in a secret detail file or in the environment"
-exit 1
+  echo "error: KOSBUILD_SECRET_PASSWORD not defined - it must be defined in a secret detail file or in the environment"
+  exit 1
 fi
 
 #  build the archive
@@ -103,4 +103,3 @@ rm -f "${OUTPUT_FILE}"
 pushd "${SECRETS_DIR}"
 7z a -t7z -mhe "${SECRET_ARG_7Z}" "${OUTPUT_FILE}" ${ALLFILES}
 popd
-
