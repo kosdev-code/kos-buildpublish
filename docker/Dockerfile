@@ -12,7 +12,7 @@ ENV PATH=$JAVA_HOME/bin:$PATH
 RUN userdel -r node
 
 # Install Maven
-ARG MAVEN_VERSION=3.9.12
+ARG MAVEN_VERSION=3.9.13
 ARG MAVEN_URL=https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
 RUN curl -fsSL ${MAVEN_URL} -o /tmp/apache-maven.tar.gz && \
     tar -xzf /tmp/apache-maven.tar.gz -C /opt && \
@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y locales \
 
 # Install 7z
 RUN apt-get install -y p7zip-full jq curl unzip git-lfs squashfs-tools-ng zip zstd xmlstarlet gettext rsync gawk &&  \
-    apt-get install -y golang nsis xorriso cpio sudo && \
+    apt-get install -y golang nsis xorriso cpio sudo vim micro && \
     rm -rf /var/lib/apt/lists/*
 
 ENV LC_ALL=en_US.UTF-8
