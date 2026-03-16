@@ -113,7 +113,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
             repository: ${{ github.repository }}
             token: ${{ secrets.GITHUB_TOKEN }}
@@ -269,7 +269,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
             repository: ${{ github.repository }}
             token: ${{ secrets.GITHUB_TOKEN }}
