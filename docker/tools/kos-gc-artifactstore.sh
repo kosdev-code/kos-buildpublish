@@ -25,76 +25,76 @@ function removeServerPrefix() {
 
 # returns a list of market artifacts from the server
 function getMarketArtifactInstances() {
-    SERVER="$1"
-    REPO="$2"
-    APIKEY="$3"
-    CONTAINERURL="$4"
+  SERVER="$1"
+  REPO="$2"
+  APIKEY="$3"
+  CONTAINERURL="$4"
 
-    INSTANCES=$(curl -s -f "${SERVER}/api/orgs/market/instances/${REPO}?apiKey=${APIKEY}")
+  INSTANCES=$(curl -s -f "${SERVER}/api/orgs/market/instances/${REPO}?apiKey=${APIKEY}")
 
-    STATUS=$(echo "${INSTANCES}" | jq -r ".status")
-    VERSION_MAJOR=$(echo "${INSTANCES}" | jq -r ".version.major")
+  STATUS=$(echo "${INSTANCES}" | jq -r ".status")
+  VERSION_MAJOR=$(echo "${INSTANCES}" | jq -r ".version.major")
 
-    if [ "${STATUS}" != "200" ] || [ "${VERSION_MAJOR}" != "1" ]; then
-       echo "invalid status/version ${STATUS}/${VERSION_MAJOR}" 1>&2
-       exit 1
-    fi
-    INSTANCES=$(echo ${INSTANCES} | jq -r '.data[]')
+  if [ "${STATUS}" != "200" ] || [ "${VERSION_MAJOR}" != "1" ]; then
+    echo "invalid status/version ${STATUS}/${VERSION_MAJOR}" 1>&2
+    echo "Skipping server ${SERVER}"
+    return
+  fi
+  INSTANCES=$(echo ${INSTANCES} | jq -r '.data[]')
 
-    # special handling in case a full URL was given.  We will remove the protocol and server name
-    # if we actually removed it, we will also remove the directory name
-    local i
-    local NEWINSTANCES=""
-    local PREFIX
-    PREFIX="$( removeServerPrefix $CONTAINERURL)/"
-    for i in $INSTANCES; do
-      local mod
-      mod="$(removeServerPrefix $i)"
-      if [ "$mod" != "$i" ]; then
-         if [[ $mod == $PREFIX* ]]; then
-           mod="${mod#$PREFIX}"
-         fi
+  # special handling in case a full URL was given.  We will remove the protocol and server name
+  # if we actually removed it, we will also remove the directory name
+  local i
+  local NEWINSTANCES=""
+  local PREFIX
+  PREFIX="$(removeServerPrefix $CONTAINERURL)/"
+  for i in $INSTANCES; do
+    local mod
+    mod="$(removeServerPrefix $i)"
+    if [ "$mod" != "$i" ]; then
+      if [[ $mod == $PREFIX* ]]; then
+        mod="${mod#$PREFIX}"
       fi
-      NEWINSTANCES+="$mod"$'\n'
-    done
-    echo "${NEWINSTANCES}"
+    fi
+    NEWINSTANCES+="$mod"$'\n'
+  done
+  echo "${NEWINSTANCES}"
 }
 
 # returns a list of nonmarket artifacts from the server
 function getNonmarketArtifactInstances() {
-    SERVER="$1"
-    REPO="$2"
-    APIKEY="$3"
-    CONTAINERURL="$4"
+  SERVER="$1"
+  REPO="$2"
+  APIKEY="$3"
+  CONTAINERURL="$4"
 
+  INSTANCES=$(curl -s -f "${SERVER}/api/orgs/instances/${REPO}?apiKey=${APIKEY}")
+  STATUS=$(echo "${INSTANCES}" | jq -r ".status")
+  VERSION_MAJOR=$(echo "${INSTANCES}" | jq -r ".version.major")
 
-    INSTANCES=$(curl -s -f "${SERVER}/api/orgs/instances/${REPO}?apiKey=${APIKEY}")
-    STATUS=$(echo "${INSTANCES}" | jq -r ".status")
-    VERSION_MAJOR=$(echo "${INSTANCES}" | jq -r ".version.major")
+  if [ "${STATUS}" != "200" ] || [ "${VERSION_MAJOR}" != "1" ]; then
+    echo "invalid status/version ${STATUS}/${VERSION_MAJOR}" 1>&2
+    exit 1
+  fi
+  INSTANCES=$(echo ${INSTANCES} | jq -r '.data[]')
 
-    if [ "${STATUS}" != "200" ] || [ "${VERSION_MAJOR}" != "1" ]; then
-       echo "invalid status/version ${STATUS}/${VERSION_MAJOR}" 1>&2
-       exit 1
-    fi
-    INSTANCES=$(echo ${INSTANCES} | jq -r '.data[]')
-
-    # special handling in case a full URL was given.  We will remove the protocol and server name
-    # if we actually removed it, we will also remove the directory name
-    local i
-    local NEWINSTANCES=""
-    local PREFIX
-    PREFIX="$( removeServerPrefix $CONTAINERURL)/"
-    for i in $INSTANCES; do
-      local mod
-      mod="$(removeServerPrefix $i)"
-      if [ "$mod" != "$i" ]; then
-         if [[ $mod == $PREFIX* ]]; then
-           mod="${mod#$PREFIX}"
-         fi
+  # special handling in case a full URL was given.  We will remove the protocol and server name
+  # if we actually removed it, we will also remove the directory name
+  local i
+  local NEWINSTANCES=""
+  local PREFIX
+  PREFIX="$(removeServerPrefix $CONTAINERURL)/"
+  for i in $INSTANCES; do
+    local mod
+    mod="$(removeServerPrefix $i)"
+    if [ "$mod" != "$i" ]; then
+      if [[ $mod == $PREFIX* ]]; then
+        mod="${mod#$PREFIX}"
       fi
-      NEWINSTANCES+="$mod"$'\n'
-    done
-    echo "${NEWINSTANCES}"
+    fi
+    NEWINSTANCES+="$mod"$'\n'
+  done
+  echo "${NEWINSTANCES}"
 }
 # returns a list of files in an azure container that are at least a day old
 function getAzureStorageFileList() {
@@ -109,28 +109,28 @@ function getAzureStorageFileList() {
     last_modified_ts=$(date -d "$last_modified" +%s)
 
     if [ "$last_modified_ts" -le "$one_day_ago" ]; then
-        echo "$blob_name"
+      echo "$blob_name"
     fi
   done
 }
 
 function azureContainerFileDelete() {
-    local ABSURL="$1"
-    local SASTKN="$2"
-    local FILENAME="$3"
+  local ABSURL="$1"
+  local SASTKN="$2"
+  local FILENAME="$3"
 
-    if [ "${DRY_RUN}" == "1" ]; then
-      echo "dry-run: would delete ${ABSURL}/${FILENAME}"
-    else
-      curl -f -X DELETE "${ABSURL}/${FILENAME}?${SASTKN}" -H "x-ms-version: 2020-10-02"
-    fi
+  if [ "${DRY_RUN}" == "1" ]; then
+    echo "dry-run: would delete ${ABSURL}/${FILENAME}"
+  else
+    curl -f -X DELETE "${ABSURL}/${FILENAME}?${SASTKN}" -H "x-ms-version: 2020-10-02"
+  fi
 }
 function getFilesToRemove() {
   local LIST1="$1"
   local LIST2="$2"
 
-  echo "$LIST1" | sort > /tmp/list1.txt
-  echo "$LIST2" | sort > /tmp/list2.txt
+  echo "$LIST1" | sort >/tmp/list1.txt
+  echo "$LIST2" | sort >/tmp/list2.txt
 
   local MISSINGFILES
   MISSINGFILES=$(comm -13 /tmp/list1.txt /tmp/list2.txt)
@@ -179,7 +179,7 @@ echo "query studio server ${DEFAULT_STUDIO_SERVER} for artifacts in ${ARTSTORE}"
 [ "${IS_MARKET}" == "false" ] && STUDIO_INSTANCES=$(getNonmarketArtifactInstances "${DEFAULT_STUDIO_SERVER}" "${ARTSTORE}" "${APIKEY}" "${CONTAINER}")
 
 if [ $STUDIO_SERVER_COUNT -ne 0 ]; then
-  for j in $( eval echo {0..$((STUDIO_SERVER_COUNT-1))} ); do
+  for j in $(eval echo {0..$((STUDIO_SERVER_COUNT - 1))}); do
     SERVER=$(jq -r ".additional_publish_servers[$j].server" ${ARTSTORE_FILENAME})
     SERVER="${SERVER/wss:\/\//https:\/\/}"
     echo "query additional studio server ${SERVER} for artifacts in ${ARTSTORE}"
@@ -192,14 +192,13 @@ CONTAINER_FILES=$(getAzureStorageFileList "${CONTAINER}" "${SASTOKEN}")
 GARBAGE_FILES="$(getFilesToRemove "${STUDIO_INSTANCES}" "${CONTAINER_FILES}")"
 CONTAINER_FILES_COUNT=$(echo "${CONTAINER_FILES}" | wc -w)
 GARBAGE_FILES_COUNT=$(echo "${GARBAGE_FILES}" | wc -w)
-CONTAINER_FILES_REMAINING=$(echo $(($CONTAINER_FILES_COUNT-$GARBAGE_FILES_COUNT)))
+CONTAINER_FILES_REMAINING=$(echo $(($CONTAINER_FILES_COUNT - $GARBAGE_FILES_COUNT)))
 
 for GC_FILE in ${GARBAGE_FILES}; do
-   echo "delete unreferenced file ${GC_FILE}"
-   azureContainerFileDelete "${CONTAINER}" "${SASTOKEN}" "${GC_FILE}"
+  echo "delete unreferenced file ${GC_FILE}"
+  azureContainerFileDelete "${CONTAINER}" "${SASTOKEN}" "${GC_FILE}"
 done
 
 echo "Number of files in container: ${CONTAINER_FILES_COUNT}"
 echo "Number of files to garbage-collect : ${GARBAGE_FILES_COUNT}"
 echo "Files remaining: ${CONTAINER_FILES_REMAINING}"
-
