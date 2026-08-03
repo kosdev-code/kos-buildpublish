@@ -33,6 +33,7 @@ function publish_artifact() {
   local FILENAME="$3"
   local REPO="$4"
   local REMOTE_FILENAME="$5"
+  local PUBLISH_SERVER="$6"
 
   ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
   # get the container and token
@@ -51,7 +52,12 @@ function publish_artifact() {
     echo "WARNING: no studio-apikey specified.  Skipping default publish"
   else
     #--server="http://host.docker.internal:8080" add this for local testing
-    publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+    if [[ "${PUBLISH_SERVER}" == "null" ]]; then
+      publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+    else
+      echo "Publishing against server: $PUBLISH_SERVER"
+      publishtool --server="$PUBLISH_SERVER" -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+    fi
     echo
   fi
 
@@ -165,6 +171,7 @@ function publish_artifact_per_configfile() {
     art_filename=$(jq -r ".artifacts[$i].filename" "${CFGFILE}")
     art_artstore=$(jq -r ".artifacts[$i].artifactstore" "${CFGFILE}")
     art_qualifier=$(jq -r ".artifacts[$i].qualifier" "${CFGFILE}")
+    art_server=$(jq -r ".artifacts[$i].server" "${CFGFILE}")
     REMOTE_FILENAME="$(jq -r ".artifacts[$i].remote_filename" "${CFGFILE}")"
 
     # if qualifier is unset, it's any
@@ -197,7 +204,7 @@ function publish_artifact_per_configfile() {
     # upload the artifact to the repo
     kos_upload_artifact "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
 
-    publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
+    publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}" "${art_server}"
   done
 
 }
