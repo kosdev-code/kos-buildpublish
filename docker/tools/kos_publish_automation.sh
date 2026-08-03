@@ -171,6 +171,8 @@ function publish_artifact_per_configfile() {
   # if publish server not set zero out var
   if [[ "$PUBLISH_SERVER" == "null" ]]; then
     PUBLISH_SERVER=""
+  else
+    echo "publish server for this config file is configured to: $PUBLISH_SERVER"
   fi
 
   # for each artifact
