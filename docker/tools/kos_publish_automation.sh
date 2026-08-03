@@ -52,7 +52,7 @@ function publish_artifact() {
     echo "WARNING: no studio-apikey specified.  Skipping default publish"
   else
     #--server="http://host.docker.internal:8080" add this for local testing
-    if [[ "${PUBLISH_SERVER}" == "null" ]]; then
+    if [[ -z $PUBLISH_SERVER || "${PUBLISH_SERVER}" == "null" ]]; then
       publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
     else
       echo "Publishing against server: $PUBLISH_SERVER"
@@ -165,6 +165,14 @@ function publish_artifact_per_configfile() {
     exit 0
   fi
 
+  local PUBLISH_SERVER
+  PUBLISH_SERVER=$(cat "${CFGFILE}" | jq '.server')
+
+  # if publish server not set zero out var
+  if [[ "$PUBLISH_SERVER" == "null" ]]; then
+    PUBLISH_SERVER=""
+  fi
+
   # for each artifact
   for i in $(eval echo "{0..$((ARTIFACT_COUNT - 1))}"); do
     art_id=$(jq -r ".artifacts[$i].id" "${CFGFILE}")
@@ -182,6 +190,14 @@ function publish_artifact_per_configfile() {
     # remote_filename is optional, so if it's not set, then blank it out
     if [[ "${REMOTE_FILENAME}" == "null" ]]; then
       REMOTE_FILENAME=""
+    fi
+
+    # User server specified for artifact if it exists
+    if [[ "$art_server" != "null" ]]; then
+      ART_PUBLISH_SERVER=$art_server
+    else
+      # other wise use top level server
+      ART_PUBLISH_SERVER=$PUBLISH_SERVER
     fi
 
     echo
@@ -204,7 +220,7 @@ function publish_artifact_per_configfile() {
     # upload the artifact to the repo
     kos_upload_artifact "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}"
 
-    publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}" "${art_server}"
+    publish_artifact "${art_id}" "${art_qualifier}" "${FILE_TO_PUBLISH}" "${art_artstore}" "${REMOTE_FILENAME}" "${ART_PUBLISH_SERVER}"
   done
 
 }
