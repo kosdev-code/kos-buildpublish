@@ -166,7 +166,7 @@ function publish_artifact_per_configfile() {
   fi
 
   local PUBLISH_SERVER
-  PUBLISH_SERVER=$(cat "${CFGFILE}" | jq '.server')
+  PUBLISH_SERVER=$(cat "${CFGFILE}" | jq -r '.server')
 
   # if publish server not set zero out var
   if [[ "$PUBLISH_SERVER" == "null" ]]; then
