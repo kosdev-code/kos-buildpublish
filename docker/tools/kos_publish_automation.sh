@@ -92,7 +92,7 @@ function publish_artifact() {
 function get_filename() {
   FILENAME_SEARCH="$1"
 
-  export KOS_STD_VERSION_REGEX="[0-9]+\.[0-9]+\.[0-9]+(-SNAPSHOT)?"
+  export KOS_STD_VERSION_REGEX="[0-9]+\.[0-9]+\.([0-9]+|x)(-SNAPSHOT)?"
   local FILENAME_DIR
   local FILELIST
   local FILECOUNT
