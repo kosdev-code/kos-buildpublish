@@ -60,6 +60,7 @@ function publish_artifact() {
   local FILENAME="$3"
   local REPO="$4"
   local REMOTE_FILENAME="$5"
+  local STUDIO2="$6"
 
   ARTSTORE_FILENAME="$HOME/.kosbuild/artifactstores/${REPO}.json"
   # get the container and token
@@ -73,11 +74,20 @@ function publish_artifact() {
 
   echo "publish artifact: ${ID}, ${ART_QUALIFIER}, ${FILENAME}, ${REPO} ${REMOTE_FILENAME}"
 
+
+  local STUDIO2_SERVER="wss://studio2.kosdev.com"
+
   # default publish
   if [ "${ARTSTORE_APIKEY}" == "null" ]; then
     echo "WARNING: no studio-apikey specified.  Skipping default publish"
   else
-    publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+    #--server="http://host.docker.internal:8080" add this for local testing
+    if [[ "${STUDIO2}" != "true" ]]; then
+      publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+    else
+      echo "Publishing against server: $STUDIO2_SERVER"
+      publishtool --server="$STUDIO2_SERVER" -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
+    fi
     echo
   fi
 
@@ -117,6 +127,7 @@ ID="$(jq -r ".id" "${KOSPUBLISH_FILE}")"
 KAB="$(jq -r ".kab" "${KOSPUBLISH_FILE}")"
 TAGS="$(jq -r ".tags // empty" "${KOSPUBLISH_FILE}")"
 ARTIFACTSTORE="$(jq -r ".artifactstore" "${KOSPUBLISH_FILE}")"
+STUDIO2="$(jq -r ".studio2" "${KOSPUBLISH_FILE}")"
 
 # sanity checks
 if [[ "$ID" == "null" || "$KAB" == "null" || "$ARTIFACTSTORE" == "null" ]]; then
@@ -143,7 +154,7 @@ if [[ "$AUTOMATION_CHECK_BYPASS" == "1" || "$GITHUB_ACTIONS" == "true" || "$USER
   kos_upload_artifact "${KAB}" "${ARTIFACTSTORE}" "${REMOTE_FILENAME}"
 
   # register the artifact with the Studio Server
-  publish_artifact "$ID" "$TAGS" "$KAB" "$ARTIFACTSTORE" "$REMOTE_FILENAME"
+  publish_artifact "$ID" "$TAGS" "$KAB" "$ARTIFACTSTORE" "$REMOTE_FILENAME" "$STUDIO2"
 else
   echo "WARNING: Automation not detected.  bypassing upload/publish."
   echo "   set AUTOMATION_CHECK_BYPASS=1 to bypass check"

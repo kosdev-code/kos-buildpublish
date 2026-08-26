@@ -165,11 +165,13 @@ function publish_artifact_per_configfile() {
     exit 0
   fi
 
-  local STUDIO2_SERVER = "wss://studio2.kosdev.com"
+  local STUDIO2_SERVER="wss://studio2.kosdev.com"
   local PUBLISH_SERVER
 
   # if the studio 2 flag is set, then use the studio 2 server 
-  PUBLISH_SERVER=$(cat "${CFGFILE}" | jq -r 'if .studio2 then ${STUDIO2_SERVER} end')
+  if jq -e '.studio2' "${CFGFILE}" > /dev/null 2>&1; then
+      PUBLISH_SERVER="${STUDIO2_SERVER}"
+  fi
 
   # if publish server not set zero out var
   if [[ "$PUBLISH_SERVER" == "null" ]]; then
