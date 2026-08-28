@@ -85,7 +85,7 @@ function publish_artifact() {
     if [[ "${STUDIO2}" != "true" ]]; then
       publishtool -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
     else
-      echo "Publishing against server: $STUDIO2_SERVER"
+      echo "Publishing against KOS Studio 2 server."
       publishtool --server="$STUDIO2_SERVER" -a "${ARTSTORE_APIKEY}" -n "${ID}" -q "${ART_QUALIFIER}" -r "${REPO}" -l "${REMOTE_FILENAME}" ${IS_MARKETPLACE} "${FILENAME}"
     fi
     echo
