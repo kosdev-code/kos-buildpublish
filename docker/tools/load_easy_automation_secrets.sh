@@ -31,6 +31,12 @@ if [ ! -f "${BUILD_DEF}" ]; then
   echo "build definition file ($BUILD_DEF) not found, in easy automation mode"
   exit 1
 else
+
+  IS_STUDIO2="$(jq -r ".studio2" "${BUILD_DEF}")"
+  if [ "$IS_STUDIO2" = "true" ]; then
+    SERVER="https://studio2.kosdev.com"
+  fi
+
   # Get the default keyset, if specified
   default_keyset=$(jq -r ".default_keyset" "${BUILD_DEF}")
 
