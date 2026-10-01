@@ -117,6 +117,10 @@ fi
 
 REPO="default_artifact_store"
 
+if [ "$IS_STUDIO2" = "true" ]; then
+  REPO="defaultArtifact"
+fi
+
 # Create the artifact store configuration file to work with current tools
 mkdir -p $HOME/.kosbuild/artifactstores
 cat >$HOME/.kosbuild/artifactstores/${REPO}.json <<EOF
