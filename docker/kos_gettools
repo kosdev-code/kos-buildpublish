@@ -14,6 +14,13 @@ else
   echo "kos-buildtools-java.tgz already downloaded"
 fi
 
+# download the wp-importer from azure
+if [ ! -f lib/wp-importer.jar ]; then
+  curl -o lib/wp-importer.jar --fail https://sausekosstudio1.blob.core.windows.net/wp-importer/wp-importer.jar
+else
+  echo "wp-importer.jar already downloaded"
+fi
+
 AZCOPY_URL=""
 # need to install azcopy
 case $(uname -m) in \
