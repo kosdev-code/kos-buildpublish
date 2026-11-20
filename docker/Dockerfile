@@ -52,6 +52,7 @@ WORKDIR /root
 
 COPY lib/kabtool.jar /usr/local/lib
 COPY lib/publishtool.jar /usr/local/lib
+COPY lib/wp-importer.jar /usr/local/lib/
 COPY tools/* /usr/local/bin/
 
 COPY kos_build_handler.sh /usr/local/bin
