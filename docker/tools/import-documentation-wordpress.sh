@@ -4,6 +4,11 @@ set -e
 # Start the shell with the environment variables specified by wp_secrets
 source "${HOME}/.kosbuild/usersecrets/wp_secrets"
 
+# Expose the slack webhook if it exists
+if [ -n "$SLACK_WEBHOOK_URL" ]; then
+  echo "SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL" >> "$GITHUB_ENV"
+fi
+
 # Use commit hash for traceability
 SHORT_SHA=$(git rev-parse --short HEAD)
 CHANGED_FILES_FILE="changed_md_files_${SHORT_SHA}.txt"
