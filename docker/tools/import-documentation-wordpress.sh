@@ -46,9 +46,9 @@ while IFS='|' read -r status file; do
         -u \"$WP_BASE_URL\" \
         -w \"$WP_USERNAME\" \
         -p \"$WP_APP_PASSWORD\" \
-        -k \"$WP_MD_KEY\" \
-        -x \"$WP_PROXY\" \
-        -y \"$WP_PROXY_PASS\" "
+        -k \"$WP_MD_KEY\" "
+#        -x \"$WP_PROXY\" \
+#        -y \"$WP_PROXY_PASS\" "
 
     # If the file is deleted, add -d true
     if [ "$status" = "Del" ]; then
