@@ -55,6 +55,5 @@ while IFS='|' read -r status file; do
         CMD="$CMD -d true"
     fi
 
-    echo "Running: $CMD"
     eval $CMD
 done < "$CHANGED_FILES_FILE"
